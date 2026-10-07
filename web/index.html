@@ -98,14 +98,28 @@
     padding: 8px 14px; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center;
   }
   .breaking-popup .bp-channel { font-size: 11px; font-weight: 600; opacity: .9; }
-  .breaking-popup .bp-body { padding: 14px; }
+  .breaking-popup .bp-body { padding: 0; }
+  .breaking-popup .bp-thumb { width: 100%; height: 140px; object-fit: cover; display: block; }
+  .breaking-popup .bp-content { padding: 14px; }
   .breaking-popup .bp-headline { font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
   .breaking-popup .bp-detail { font-size: 13px; color: #b0bac6; line-height: 1.5; }
+  .breaking-popup .bp-source { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #2a3546; }
+  .breaking-popup .bp-logo { height: 24px; width: auto; max-width: 80px; object-fit: contain; background: #fff; border-radius: 4px; padding: 3px 6px; }
+  .breaking-popup .bp-channel-name { font-size: 12px; color: #8b98a8; font-weight: 600; }
   .breaking-btn {
     background: #ff4444; color: #fff; border: none; border-radius: 6px;
     padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; margin-left: 10px;
   }
   .breaking-btn:hover { background: #dd3333; }
+  /* Agent Admin */
+  .admin-section { padding: 0 4px; }
+  .provider-block { margin-bottom: 32px; }
+  .provider-block h3 { font-size: 18px; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
+  .provider-block .provider-count { font-size: 13px; color: #5c6b7d; font-weight: 400; }
+  .provider-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 14px; }
+  .provider-ch { background: #161d28; border: 1px solid #232e3f; border-radius: 8px; padding: 12px 14px; }
+  .provider-ch .ch-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .provider-ch .ch-desc { font-size: 12px; color: #8b98a8; }
 </style>
 </head>
 <body>
@@ -122,6 +136,7 @@
 <div class="tabs">
   <button class="active" data-tab="livetv">Live TV</button>
   <button data-tab="sports">Sports Hub</button>
+  <button data-tab="admin">Agent Admin</button>
 </div>
 
 <div class="tab-panel active" id="panel-livetv">
@@ -149,6 +164,14 @@
   </div>
 </div>
 
+<div class="tab-panel" id="panel-admin">
+  <div class="admin-section">
+    <h2>Agent Admin — Provider Channel Lineups</h2>
+    <p style="color:#8b98a8;font-size:14px;margin-bottom:20px;">Channel lineups by provider for agent testing and personalization.</p>
+    <div id="provider-lineups"></div>
+  </div>
+</div>
+
 <div class="modal" id="modal"><div class="modal-card">
   <h2 id="m-title"></h2>
   <p id="m-desc"></p>
@@ -162,6 +185,11 @@ Content from ESPN, HBO, CNN, and respective networks · Movie & TV data via TMDB
 <script>
 let CHANNELS = [], PROGRAMS = [], AGENTS = [], TEAMS = {};
 let BREAKING_NEWS = [], activeBreaking = null;
+let PROVIDER_LINEUPS = {};
+
+const PROVIDER_COLORS = {
+  'ESPN': '#cc0000', 'Plex': '#e5a00d', 'Disney+': '#113ccf', 'Prime Video': '#00a8e1', 'ANoki': '#7c3aed'
+};
 // Genre -> local real photo(s). Sports have multiple for variety (picked by title hash).
 const GENRE_IMG = {
   football: ['img/football.jpg','img/football2.jpg','img/football3.jpg','img/football4.jpg','img/football6.jpg','img/football7.jpg','img/football8.jpg'],
@@ -529,9 +557,20 @@ function renderAll() {
   const gf = document.getElementById('genre-filter').value;
   renderEPG('epg', gf ? CHANNELS.filter(c=>c.genre===gf) : CHANNELS);
   renderSports();
+  renderAdmin();
   const d = new Date();
   document.getElementById('clock').textContent = d.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 }
+
+// News network logos for breaking news attribution
+const NEWS_LOGOS = {
+  'CNN': 'img/logos/news_cnn.png',
+  'Fox News': 'img/logos/news_fox.png',
+  'MSNBC': 'img/logos/news_msnbc.png',
+  'BBC World News': 'img/logos/news_bbc.png',
+};
+// Breaking news thumbnails (varied news images)
+const BREAKING_THUMBS = ['img/news.jpg','img/news2.jpg','img/news3.jpg','img/news4.jpg','img/news5.jpg'];
 
 function triggerBreaking() {
   if (!BREAKING_NEWS.length) return;
@@ -547,13 +586,22 @@ function showBreakingPopup() {
   const container = document.getElementById('breaking-container');
   container.innerHTML = '';
   const b = activeBreaking;
+  const logo = NEWS_LOGOS[b.channel];
+  const thumb = BREAKING_THUMBS[Math.floor(Math.random() * BREAKING_THUMBS.length)];
   const d = document.createElement('div');
   d.className = 'breaking-popup';
   d.innerHTML = `
-    <div class="bp-header"><span>BREAKING NEWS</span><span class="bp-channel">${escHtml(b.channel)}</span></div>
+    <div class="bp-header"><span>BREAKING NEWS</span></div>
     <div class="bp-body">
-      <div class="bp-headline">${escHtml(b.headline.replace('BREAKING: ', ''))}</div>
-      <div class="bp-detail">${escHtml(b.detail)}</div>
+      <img class="bp-thumb" src="${thumb}" alt="">
+      <div class="bp-content">
+        <div class="bp-headline">${escHtml(b.headline.replace('BREAKING: ', ''))}</div>
+        <div class="bp-detail">${escHtml(b.detail)}</div>
+        <div class="bp-source">
+          ${logo ? `<img class="bp-logo" src="${logo}" alt="${escHtml(b.channel)}">` : ''}
+          <span class="bp-channel-name">${escHtml(b.channel)}</span>
+        </div>
+      </div>
     </div>`;
   d.onclick = () => {
     d.classList.add('hide');
@@ -566,15 +614,39 @@ function showBreakingPopup() {
   }, 15000);
 }
 
+function renderAdmin() {
+  const el = document.getElementById('provider-lineups');
+  if (!el) return;
+  el.innerHTML = '';
+  Object.keys(PROVIDER_LINEUPS).forEach(provider => {
+    const channels = PROVIDER_LINEUPS[provider];
+    const color = PROVIDER_COLORS[provider] || '#4da3ff';
+    const block = document.createElement('div');
+    block.className = 'provider-block';
+    block.innerHTML = `
+      <h3><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${color}"></span>
+        Channel lineup from ${escHtml(provider)} <span class="provider-count">${channels.length} channels</span></h3>
+      <div class="provider-grid">
+        ${channels.map(([name, desc]) => `
+          <div class="provider-ch">
+            <div class="ch-name">${escHtml(name)}</div>
+            <div class="ch-desc">${escHtml(desc)}</div>
+          </div>`).join('')}
+      </div>`;
+    el.appendChild(block);
+  });
+}
+
 async function init() {
-  const [ch, pr, ag, tm, bn] = await Promise.all([
+  const [ch, pr, ag, tm, bn, pl] = await Promise.all([
     fetch('data/channels.json').then(r=>r.json()),
     fetch('data/programs.json').then(r=>r.json()),
     fetch('data/agents.json').then(r=>r.json()),
     fetch('data/teams.json').then(r=>r.json()).catch(()=>({})),
     fetch('data/breaking_news.json').then(r=>r.json()).catch(()=>({scenarios:[]})),
+    fetch('data/provider_lineups.json').then(r=>r.json()).catch(()=>({})),
   ]);
-  CHANNELS = ch; PROGRAMS = pr; AGENTS = ag; TEAMS = tm; BREAKING_NEWS = bn.scenarios || [];
+  CHANNELS = ch; PROGRAMS = pr; AGENTS = ag; TEAMS = tm; BREAKING_NEWS = bn.scenarios || []; PROVIDER_LINEUPS = pl;
   // agent select
   const sel = document.getElementById('agent');
   AGENTS.forEach((a,i) => { const o=document.createElement('option'); o.value=i; o.textContent=a.name; sel.appendChild(o); });
