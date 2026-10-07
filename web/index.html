@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPG Farm — Live Linear TV Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a0e14; color: #e8ecf1; }
+  header { padding: 16px 24px; border-bottom: 1px solid #1c2530; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 20px; font-weight: 700; }
+  header h1 span { color: #4da3ff; }
+  .agent-bar { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .agent-bar label { font-size: 13px; color: #8b98a8; }
+  .agent-bar select { background: #141b26; color: #e8ecf1; border: 1px solid #2a3542; border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+  .agent-tag { font-size: 12px; color: #8b98a8; font-style: italic; }
+  .tabs { display: flex; gap: 4px; padding: 0 24px; border-bottom: 1px solid #1c2530; }
+  .tabs button { background: none; border: none; color: #8b98a8; padding: 14px 20px; font-size: 15px; cursor: pointer; border-bottom: 2px solid transparent; }
+  .tabs button.active { color: #fff; border-bottom-color: #4da3ff; font-weight: 600; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  /* For You rail */
+  .rail { padding: 20px 24px 0; }
+  .rail h2 { font-size: 16px; margin-bottom: 12px; }
+  .rail h2 span { color: #4da3ff; }
+  .rail-cards { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+  .pick-card { min-width: 220px; max-width: 220px; background: #141b26; border: 1px solid #2a3542; border-radius: 10px; padding: 14px; cursor: pointer; overflow: hidden; }
+  .pick-card:hover { border-color: #4da3ff; }
+  .pick-card .live-dot { display: inline-block; width: 8px; height: 8px; background: #ff4444; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; }
+  .pick-card .art { height: 100px; margin: -14px -14px 10px -14px; background-size: cover; background-position: center; position: relative; }
+  .pick-card .art .art-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,27,38,.9), transparent 60%); }
+  .pick-card .art .art-live { position: absolute; top: 8px; left: 8px; background: #ff4444; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+  .pick-card .art .team-logos { position: absolute; bottom: 6px; left: 8px; display: flex; gap: 6px; }
+  .pick-card .art .team-logos img { width: 32px; height: 32px; object-fit: contain; background: rgba(255,255,255,.95); border-radius: 50%; padding: 2px; }
+  @keyframes pulse { 50% { opacity: 0.4; } }
+  .pick-card h3 { font-size: 14px; margin-bottom: 6px; }
+  .pick-card p { font-size: 12px; color: #8b98a8; }
+  .pick-card .meta { font-size: 11px; color: #5c6b7d; margin-top: 8px; }
+  /* EPG grid */
+  .epg-wrap { padding: 20px 24px; }
+  .epg-controls { display: flex; gap: 12px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+  .epg-controls select { background: #141b26; color: #e8ecf1; border: 1px solid #2a3542; border-radius: 8px; padding: 6px 10px; font-size: 13px; }
+  .epg-scroll { overflow: auto; border: 1px solid #1c2530; border-radius: 10px; max-height: 65vh; }
+  .epg-timeline { min-width: 1100px; }
+  .epg-time-header { display: flex; position: sticky; top: 0; z-index: 3; background: #0f151e; }
+  .epg-time-header .corner { width: 170px; min-width: 170px; position: sticky; left: 0; z-index: 4; background: #0f151e; }
+  .epg-time-header .th { flex: 1; padding: 10px 8px; font-size: 12px; color: #8b98a8; border-bottom: 1px solid #1c2530; border-left: 1px solid #161d27; }
+  .epg-row { display: flex; border-bottom: 1px solid #1c2530; }
+  .epg-ch { width: 170px; min-width: 170px; position: sticky; left: 0; z-index: 2; background: #0f151e; padding: 10px 12px; }
+  .epg-ch .num { font-size: 11px; color: #5c6b7d; }
+  .epg-ch .name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .epg-track { flex: 1; position: relative; min-height: 56px; }
+  .epg-prog { position: absolute; top: 4px; bottom: 4px; border-right: 1px solid #161d27; padding: 8px 10px; overflow: hidden; cursor: pointer; background: #111722; border-radius: 4px; }
+  .epg-prog:hover { background: #1a2331; }
+  .epg-prog.live { background: #1c2530; border-left: 3px solid #ff4444; }
+  .epg-prog .t { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .epg-prog .d { font-size: 11px; color: #8b98a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .epg-prog .live-badge { font-size: 10px; color: #ff4444; font-weight: 700; }
+  /* Sports hub */
+  .sports-section { padding: 20px 24px; }
+  .sports-section h2 { font-size: 16px; margin-bottom: 12px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .tile { background: #141b26; border: 1px solid #2a3542; border-radius: 12px; padding: 16px; cursor: pointer; overflow: hidden; }
+  .tile:hover { border-color: #4da3ff; }
+  .tile.live { border-color: #ff4444; }
+  .tile .art { height: 140px; margin: -16px -16px 12px -16px; background-size: cover; background-position: center; position: relative; }
+  .tile .art .art-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,27,38,.9), transparent 60%); }
+  .tile .art .art-live { position: absolute; top: 10px; left: 10px; background: #ff4444; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+  .tile .art .art-upcoming { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,.65); color: #fff; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+  .pick-card .art .art-upcoming { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.65); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+  .tile .art .team-logos { position: absolute; bottom: 8px; left: 10px; display: flex; gap: 8px; align-items: center; }
+  .tile .art .team-logos img { width: 40px; height: 40px; object-fit: contain; background: rgba(255,255,255,.95); border-radius: 50%; padding: 3px; }
+  .tile h3 { font-size: 15px; margin-bottom: 6px; }
+  .tile p { font-size: 13px; color: #8b98a8; margin-bottom: 8px; }
+  .tile .meta { font-size: 12px; color: #5c6b7d; }
+  .tile .live-badge { color: #ff4444; font-weight: 700; font-size: 12px; }
+  /* Modal */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+  .modal.open { display: flex; }
+  .modal-card { background: #141b26; border: 1px solid #2a3542; border-radius: 14px; padding: 28px; max-width: 480px; width: 90%; }
+  .modal-card h2 { font-size: 20px; margin-bottom: 10px; }
+  .modal-card p { font-size: 14px; color: #b0bac6; line-height: 1.6; margin-bottom: 12px; }
+  .modal-card .meta { font-size: 12px; color: #8b98a8; margin-bottom: 20px; }
+  .modal-card button { background: #4da3ff; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; cursor: pointer; }
+  .footer { padding: 20px 24px; font-size: 12px; color: #5c6b7d; border-top: 1px solid #1c2530; margin-top: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>EPG</span> Farm</h1>
+  <div class="agent-bar">
+    <label for="agent">Viewer:</label>
+    <select id="agent"></select>
+    <span class="agent-tag" id="agent-tag"></span>
+  </div>
+</header>
+<div class="tabs">
+  <button class="active" data-tab="livetv">Live TV</button>
+  <button data-tab="sports">Sports Hub</button>
+</div>
+
+<div class="tab-panel active" id="panel-livetv">
+  <div class="rail">
+    <h2>Top picks for <span id="agent-name"></span></h2>
+    <div class="rail-cards" id="picks"></div>
+  </div>
+  <div class="epg-wrap">
+    <div class="epg-controls">
+      <select id="genre-filter"><option value="">All genres</option></select>
+      <span id="clock" style="font-size:13px;color:#8b98a8"></span>
+    </div>
+    <div class="epg-scroll"><div class="epg-grid" id="epg"></div></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="panel-sports">
+  <div class="sports-section">
+    <h2><span style="color:#ff4444">●</span> Live now</h2>
+    <div id="sports-apps"></div>
+  </div>
+  <div class="sports-section">
+    <h2>Upcoming games</h2>
+    <div class="tiles" id="upcoming-tiles"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="modal-card">
+  <h2 id="m-title"></h2>
+  <p id="m-desc"></p>
+  <div class="meta" id="m-meta"></div>
+  <button onclick="closeModal()">Close</button>
+</div></div>
+
+<div class="footer">EPG Farm — live linear TV guide. 100 channels · 7-day guide · 10 viewer agents.<br>
+Content from ESPN, HBO, CNN, and respective networks · Movie & TV data via TMDB · Schedules simulated for demo.</div>
+
+<script>
+let CHANNELS = [], PROGRAMS = [], AGENTS = [], TEAMS = {};
+// Genre -> local real photo(s). Sports have multiple for variety (picked by title hash).
+const GENRE_IMG = {
+  football: ['img/football.jpg','img/football2.jpg','img/football3.jpg','img/football4.jpg','img/football6.jpg','img/football7.jpg','img/football8.jpg'],
+  basketball: ['img/basketball.jpg','img/basketball2.jpg','img/basketball3.jpg','img/basketball4.jpg','img/basketball5.jpg','img/basketball6.jpg','img/basketball7.jpg','img/basketball8.jpg'],
+  soccer: ['img/soccer.jpg','img/soccer2.jpg','img/soccer3.jpg'],
+  tennis: 'img/tennis.jpg', racing: 'img/racing.jpg', golf: 'img/golf.jpg',
+  baseball: 'img/football.jpg', hockey: 'img/football.jpg', olympics: 'img/olympics.jpg',
+  college: 'img/football.jpg', studio: 'img/football.jpg', news: 'img/football.jpg',
+  general: ['img/news.jpg','img/news2.jpg','img/news3.jpg','img/news4.jpg','img/news5.jpg'], business: ['img/news.jpg','img/news2.jpg','img/news3.jpg'], international: 'img/international.jpg',
+  weather: 'img/news.jpg', politics: 'img/news.jpg',
+  premium: 'img/movies.jpg', classics: 'img/movies.jpg', indie: 'img/movies.jpg', comedy: 'img/entertainment.jpg',
+  animation: 'img/kids.jpg', family: 'img/kids.jpg', preschool: 'img/kids.jpg', educational: 'img/kids.jpg',
+  broadcast: 'img/entertainment.jpg', cable: 'img/entertainment.jpg', reality: 'img/entertainment.jpg', celebrity: 'img/entertainment.jpg',
+  nature: 'img/documentary.jpg', history: 'img/documentary.jpg', wildlife: 'img/documentary.jpg',
+  science: 'img/documentary.jpg', crime: 'img/documentary.jpg', culture: 'img/documentary.jpg',
+  home: 'img/lifestyle.jpg', food: 'img/lifestyle.jpg', talk: 'img/lifestyle.jpg',
+  movies: 'img/lifestyle.jpg', shopping: 'img/lifestyle.jpg',
+  pop: 'img/music.jpg', hiphop: 'img/music.jpg', country: 'img/music.jpg',
+  uk: 'img/international.jpg', spanish: 'img/international.jpg', french: 'img/international.jpg',
+  german: 'img/international.jpg', japanese: 'img/international.jpg', hindi: 'img/international.jpg',
+  portuguese: 'img/international.jpg', italian: 'img/international.jpg', chinese: 'img/international.jpg',
+};
+function artFor(prog, idx) {
+  if (prog.poster) return prog.poster;  // Real TMDB poster
+  let img = GENRE_IMG[prog.subgenre] || GENRE_IMG[prog.genre] || 'img/entertainment.jpg';
+  if (Array.isArray(img)) {
+    // Round-robin by position: guarantees visible tiles never repeat
+    img = img[(idx || 0) % img.length];
+  }
+  return img;
+}
+function teamLogo(teamName) {
+  return (TEAMS[teamName] && TEAMS[teamName].logo) || '';
+}
+let currentAgent = null;
+
+// Seeded RNG (mulberry32)
+function rng(seed) {
+  let a = seed >>> 0;
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
+  return h >>> 0;
+}
+// Dayparting weights per genre by hour
+function daypartScore(genre, hour) {
+  const table = {
+    news: h => (h>=6&&h<9)||(h>=17&&h<20) ? 3 : (h>=9&&h<17) ? 1.5 : 1,
+    kids: h => (h>=6&&h<12)||(h>=15&&h<18) ? 3 : 0.6,
+    sports: h => (h>=18&&h<23) ? 3 : (h>=12&&h<18) ? 1.5 : 0.8,
+    movies: h => (h>=19&&h<24) ? 3 : 1,
+    entertainment: h => (h>=19&&h<23) ? 3 : 1,
+    documentary: h => (h>=20&&h<23) ? 2 : 1,
+    lifestyle: h => (h>=9&&h<15) ? 2.5 : 1,
+    music: h => (h>=22||h<2) ? 2 : 1,
+    international: h => 1,
+  };
+  return (table[genre] || (() => 1))(hour);
+}
+// Build one channel's schedule for one date (deterministic)
+function buildDaySchedule(ch, dateStr) {
+  // Prefer exact subgenre match (Golf Channel gets golf only); fall back to genre
+  let pool = PROGRAMS.filter(p => p.genre === ch.genre && p.subgenre === ch.subgenre);
+  if (!pool.length) pool = PROGRAMS.filter(p => p.genre === ch.genre);
+  if (!pool.length) return [];
+  const r = rng(hashStr(ch.id + dateStr));
+  const slots = [];
+  let t = 0; // minutes from midnight
+  let lastIdx = -1;
+  while (t < 1440) {
+    const hour = Math.floor(t / 60);
+    // weighted pick by daypart and live boost
+    const weights = pool.map(p => daypartScore(p.genre, hour) * (p.live ? 1.5 : 1));
+    let sum = weights.reduce((a,b)=>a+b,0), x = r()*sum, idx = 0;
+    for (let i=0;i<weights.length;i++){ x -= weights[i]; if(x<=0){idx=i;break;} }
+    if (idx === lastIdx) idx = (idx+1)%pool.length; // avoid immediate repeat
+    lastIdx = idx;
+    const p = pool[idx];
+    const dur = Math.min(p.duration_min, 1440 - t);
+    slots.push({ prog: p, start: t, end: t + dur });
+    t += dur;
+  }
+  return slots;
+}
+function fmtTime(mins) {
+  const h = Math.floor(mins/60)%24, m = mins%60;
+  const ap = h >= 12 ? 'PM' : 'AM';
+  const hh = h%12===0?12:h%12;
+  return `${hh}:${String(m).padStart(2,'0')} ${ap}`;
+}
+function nowMins() { const d = new Date(); return d.getHours()*60 + d.getMinutes(); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+function openModal(prog, ch, start, end) {
+  document.getElementById('m-title').textContent = prog.title;
+  document.getElementById('m-desc').textContent = prog.desc;
+  document.getElementById('m-meta').textContent =
+    `${ch.name} · Ch ${ch.number} · ${fmtTime(start)} – ${fmtTime(end)} · ${prog.rating} · ${prog.year}${prog.live ? ' · LIVE' : ''}`;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') closeModal(); });
+
+function scoreForAgent(prog, agent) {
+  let s = (agent.genres[prog.genre] || 0.1);
+  if (prog.live) s += 0.3;
+  if (agent.fav_sports.includes(prog.subgenre)) s += 0.5;
+  return s;
+}
+
+function artHtml(prog, isLive, showLogos, idx, startMin) {
+  const art = artFor(prog, idx);
+  const statusBadge = isLive
+    ? '<span class="art-live">LIVE</span>'
+    : `<span class="art-upcoming">${fmtTime(startMin)}</span>`;
+  let logos = '';
+  if (showLogos && prog.genre === 'sports') {
+    const m = prog.title.match(/:\s*(.+?)\s+vs\s+(.+)$/);
+    if (m) {
+      const l1 = teamLogo(m[1]), l2 = teamLogo(m[2]);
+      if (l1 || l2) logos = `<div class="team-logos">${l1?`<img src="${l1}" alt="">`:''}${l2?`<img src="${l2}" alt="">`:''}</div>`;
+    }
+  }
+  return `<div class="art" style="background-image:url('${art}')"><div class="art-grad"></div>${statusBadge}${logos}</div>`;
+}
+
+function renderPicks() {
+  const el = document.getElementById('picks');
+  document.getElementById('agent-name').textContent = currentAgent.name;
+  document.getElementById('agent-tag').textContent = currentAgent.tagline;
+  const now = nowMins(), date = todayStr();
+  const cands = [];
+  for (const ch of CHANNELS) {
+    for (const s of buildDaySchedule(ch, date)) {
+      if (s.end > now && s.start < now + 240) cands.push({...s, ch});
+    }
+  }
+  cands.sort((a,b) => scoreForAgent(b.prog, currentAgent) - scoreForAgent(a.prog, currentAgent));
+  // Diversify: max 4 per genre so the rail mixes content types
+  const picked = [], genreCount = {};
+  for (const c of cands) {
+    if (picked.length >= 10) break;
+    const g = c.prog.genre;
+    if ((genreCount[g] || 0) >= 4) continue;
+    genreCount[g] = (genreCount[g] || 0) + 1;
+    picked.push(c);
+  }
+  el.innerHTML = '';
+  picked.forEach((c, i) => {
+    const isLive = c.start <= now && c.end > now;
+    const d = document.createElement('div');
+    d.className = 'pick-card';
+    d.innerHTML = `${artHtml(c.prog, isLive, true, i, c.start)}<h3>${isLive?'<span class="live-dot"></span>':''}${escHtml(c.prog.title)}</h3>
+      <p>${escHtml(c.prog.desc.slice(0,80))}...</p>
+      <div class="meta">${c.ch.name} · ${isLive?'Now':fmtTime(c.start)}</div>`;
+    d.onclick = () => openModal(c.prog, c.ch, c.start, c.end);
+    el.appendChild(d);
+  });
+}
+
+function renderEPG(gridId, channelList) {
+  const grid = document.getElementById(gridId);
+  const now = nowMins(), date = todayStr();
+  const startMin = Math.max(0, Math.floor(now/60)-1)*60, hours = 6, totalMin = hours*60;
+  // header
+  let html = `<div class="epg-timeline"><div class="epg-time-header"><div class="corner"></div>`;
+  for (let h=0; h<hours; h++) html += `<div class="th">${fmtTime(startMin+h*60)}</div>`;
+  html += `</div>`;
+  // rows
+  for (const ch of channelList) {
+    const sched = buildDaySchedule(ch, date).filter(s => s.end > startMin && s.start < startMin+totalMin);
+    html += `<div class="epg-row"><div class="epg-ch"><div class="num">${ch.number}</div><div class="name">${ch.name}</div></div><div class="epg-track">`;
+    for (const s of sched) {
+      const isLive = s.start <= now && s.end > now;
+      const left = Math.max(0, (s.start-startMin)/totalMin*100);
+      const width = Math.min(100-left, (s.end-Math.max(s.start,startMin))/totalMin*100);
+      if (width < 1) continue;
+      html += `<div class="epg-prog${isLive?' live':''}" style="left:${left}%;width:${width}%"
+        onclick='openModalById("${s.prog.id}","${ch.id}",${s.start},${s.end})'>
+        <div class="t">${isLive?'<span class="live-badge">LIVE </span>':''}${escHtml(s.prog.title)}</div>
+        <div class="d">${fmtTime(s.start)} – ${fmtTime(s.end)}</div></div>`;
+    }
+    html += `</div></div>`;
+  }
+  grid.innerHTML = html + `</div>`;
+}
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function openModalById(pid, cid, start, end) {
+  const prog = PROGRAMS.find(p=>p.id===pid), ch = CHANNELS.find(c=>c.id===cid);
+  if (prog && ch) openModal(prog, ch, start, end);
+}
+
+// Simulated live scores for games (deterministic, progresses with elapsed time)
+function simScore(prog, startMin, nowMin) {
+  const m = prog.title.match(/:\s*(.+?)\s+vs\s+(.+)$/);
+  if (!m) return null;
+  const [, teamA, teamB] = m;
+  const elapsed = Math.max(1, nowMin - startMin);
+  const r = rng(hashStr(prog.title + todayStr()));
+  const sub = prog.subgenre;
+  // sport-specific scoring
+  if (sub === 'football') {
+    const q = Math.min(4, 1 + Math.floor(elapsed / 30));
+    const a = Math.floor(r()*4)*7 + Math.floor(r()*3)*3;
+    const b = Math.floor(r()*4)*7 + Math.floor(r()*3)*3;
+    return { a: teamA, b: teamB, sa: a, sb: b, clock: `Q${q} ${15 - Math.floor((elapsed%30)/2)}:${String(59 - Math.floor(r()*59)).padStart(2,'0')}` };
+  }
+  if (sub === 'basketball') {
+    const q = Math.min(4, 1 + Math.floor(elapsed / 25));
+    const a = 40 + Math.floor(r()*elapsed*0.9), b = 40 + Math.floor(r()*elapsed*0.9);
+    return { a: teamA, b: teamB, sa: a, sb: b, clock: `Q${q} ${12 - Math.floor((elapsed%25)/2)}:${String(59 - Math.floor(r()*59)).padStart(2,'0')}` };
+  }
+  if (sub === 'soccer') {
+    const half = elapsed < 55 ? 1 : 2, min = Math.min(90, elapsed > 55 ? elapsed - 10 : elapsed);
+    const a = Math.floor(r()*3), b = Math.floor(r()*3);
+    return { a: teamA, b: teamB, sa: a, sb: b, clock: `${min}' ${half===1?'1H':'2H'}` };
+  }
+  if (sub === 'baseball') {
+    const inn = Math.min(9, 1 + Math.floor(elapsed / 18));
+    const a = Math.floor(r()*8), b = Math.floor(r()*8);
+    return { a: teamA, b: teamB, sa: a, sb: b, clock: `${inn}${inn===1?'st':inn===2?'nd':inn===3?'rd':'th'} inn` };
+  }
+  if (sub === 'hockey') {
+    const p = Math.min(3, 1 + Math.floor(elapsed / 30));
+    const a = Math.floor(r()*5), b = Math.floor(r()*5);
+    return { a: teamA, b: teamB, sa: a, sb: b, clock: `P${p} ${20 - Math.floor((elapsed%30)/1.5)}:${String(59 - Math.floor(r()*59)).padStart(2,'0')}` };
+  }
+  // generic
+  const a = Math.floor(r()*elapsed/8), b = Math.floor(r()*elapsed/8);
+  return { a: teamA, b: teamB, sa: a, sb: b, clock: `${elapsed}'` };
+}
+
+// Independent CTV sports apps (not linear channels)
+const SPORTS_APPS = [
+  { name: "ESPN", sports: ["football","basketball","baseball","hockey","soccer","tennis","golf","olympics","college"], color: "#cc0000" },
+  { name: "NFL", sports: ["football"], color: "#013369" },
+  { name: "NBA", sports: ["basketball"], color: "#1d428a" },
+  { name: "MLB", sports: ["baseball"], color: "#002d72" },
+  { name: "NHL", sports: ["hockey"], color: "#000000" },
+  { name: "PGA Tour", sports: ["golf"], color: "#0a3d2e" },
+  { name: "Tennis Channel", sports: ["tennis"], color: "#7ab929" },
+  { name: "DAZN", sports: ["soccer","boxing"], color: "#f7f7f7" },
+];
+
+function appForGame(prog) {
+  // Most specific app first (league app), ESPN as fallback aggregator
+  for (const app of SPORTS_APPS) {
+    if (app.name === "ESPN") continue;
+    if (app.sports.includes(prog.subgenre)) return app;
+  }
+  return SPORTS_APPS[0]; // ESPN
+}
+
+function renderSports() {
+  const now = nowMins(), date = todayStr();
+  const sportsChs = CHANNELS.filter(c=>c.genre==='sports');
+  const live = [], upcoming = [];
+  for (const ch of sportsChs) {
+    for (const s of buildDaySchedule(ch, date)) {
+      if (!s.prog.live && !/vs|Live/i.test(s.prog.title)) continue;
+      const item = {...s, ch, app: appForGame(s.prog)};
+      if (s.start <= now && s.end > now) live.push(item);
+      else if (s.start > now && s.start < now + 360) upcoming.push(item);
+    }
+  }
+  // personal sort: agent's fav sports first
+  const sportRank = s => {
+    const i = currentAgent.fav_sports.indexOf(s.prog.subgenre);
+    return i === -1 ? 99 : i;
+  };
+  live.sort((a,b)=>sportRank(a)-sportRank(b));
+  upcoming.sort((a,b)=> a.start-b.start || sportRank(a)-sportRank(b));
+  // Deduplicate: same game title only shows once
+  const seen = new Set();
+  const dedup = list => list.filter(s => {
+    if (seen.has(s.prog.title)) return false;
+    seen.add(s.prog.title);
+    return true;
+  });
+  // Group live games by app
+  const byApp = {};
+  dedup(live).forEach(s => {
+    const an = s.app.name;
+    if (!byApp[an]) byApp[an] = { app: s.app, games: [] };
+    byApp[an].games.push(s);
+  });
+  // Render app sections
+  const appsEl = document.getElementById('sports-apps');
+  appsEl.innerHTML = '';
+  SPORTS_APPS.forEach((appDef, ai) => {
+    const group = byApp[appDef.name];
+    if (!group) return;
+    const section = document.createElement('div');
+    section.innerHTML = `<div style="display:flex;align-items:center;gap:10px;margin:18px 0 12px;">
+      <div style="width:36px;height:36px;border-radius:8px;background:${appDef.color};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;">${appDef.name.slice(0,2).toUpperCase()}</div>
+      <h3 style="margin:0;font-size:16px;">${appDef.name}</h3>
+      <span style="font-size:12px;color:#5c6b7d;">${group.games.length} live</span></div>
+      <div class="tiles" id="app-tiles-${ai}"></div>`;
+    appsEl.appendChild(section);
+    const tilesEl = section.querySelector(`#app-tiles-${ai}`);
+    group.games.slice(0, 8).forEach((s, i) => {
+      const d = document.createElement('div');
+      d.className = 'tile live';
+      let scoreHtml = '';
+      const sc = simScore(s.prog, s.start, now);
+      if (sc) scoreHtml = `<div style="font-size:18px;font-weight:700;margin:8px 0">${escHtml(sc.a)} ${sc.sa} – ${sc.sb} ${escHtml(sc.b)} <span style="font-size:12px;color:#ff4444;font-weight:400">${sc.clock}</span></div>`;
+      d.innerHTML = `${artHtml(s.prog, true, true, i, s.start)}<h3>${escHtml(s.prog.title)}</h3>${scoreHtml}
+        <p>${escHtml(s.prog.desc)}</p><div class="meta">${appDef.name} app</div>`;
+      d.onclick = () => openModal(s.prog, s.ch, s.start, s.end);
+      tilesEl.appendChild(d);
+    });
+  });
+  // Upcoming (keep as tiles)
+  const up = document.getElementById('upcoming-tiles'); up.innerHTML='';
+  dedup(upcoming).slice(0, 8).forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'tile';
+    d.innerHTML = `${artHtml(s.prog, false, true, i, s.start)}<h3>${escHtml(s.prog.title)}</h3>
+      <p>${escHtml(s.prog.desc)}</p><div class="meta">${s.app.name} app · ${fmtTime(s.start)}</div>`;
+    d.onclick = () => openModal(s.prog, s.ch, s.start, s.end);
+    up.appendChild(d);
+  });
+}
+
+function currentProgram(ch, date) {
+  const now = nowMins();
+  const s = buildDaySchedule(ch, date).find(x => x.start <= now && x.end > now);
+  return s ? { ...s, ch } : null;
+}
+
+function renderLiveTilesAll() {
+  const now = nowMins(), date = todayStr();
+  const c = document.getElementById('live-tiles-all'); c.innerHTML = '';
+  const live = [];
+  const seen = new Set();
+  for (const ch of CHANNELS) {
+    const s = currentProgram(ch, date);
+    // Skip duplicates: same program already shown on another channel
+    if (s && !seen.has(s.prog.title)) { seen.add(s.prog.title); live.push(s); }
+  }
+  live.slice(0, 12).forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'tile live';
+    let scoreHtml = '';
+    if (s.ch.genre === 'sports') {
+      const sc = simScore(s.prog, s.start, now);
+      if (sc) scoreHtml = `<div style="font-size:18px;font-weight:700;margin:8px 0">${escHtml(sc.a)} ${sc.sa} – ${sc.sb} ${escHtml(sc.b)} <span style="font-size:12px;color:#ff4444;font-weight:400">${sc.clock}</span></div>`;
+    }
+    d.innerHTML = `${artHtml(s.prog, true, true, i, s.start)}<h3>${escHtml(s.prog.title)}</h3>${scoreHtml}
+      <p>${escHtml(s.prog.desc)}</p><div class="meta">${s.ch.number} · ${s.ch.name} · ends ${fmtTime(s.end)}</div>`;
+    d.onclick = () => openModal(s.prog, s.ch, s.start, s.end);
+    c.appendChild(d);
+  });
+}
+
+function renderAll() {
+  renderPicks();
+  const gf = document.getElementById('genre-filter').value;
+  renderEPG('epg', gf ? CHANNELS.filter(c=>c.genre===gf) : CHANNELS);
+  renderSports();
+  const d = new Date();
+  document.getElementById('clock').textContent = d.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+async function init() {
+  const [ch, pr, ag, tm] = await Promise.all([
+    fetch('data/channels.json').then(r=>r.json()),
+    fetch('data/programs.json').then(r=>r.json()),
+    fetch('data/agents.json').then(r=>r.json()),
+    fetch('data/teams.json').then(r=>r.json()).catch(()=>({})),
+  ]);
+  CHANNELS = ch; PROGRAMS = pr; AGENTS = ag; TEAMS = tm;
+  // agent select
+  const sel = document.getElementById('agent');
+  AGENTS.forEach((a,i) => { const o=document.createElement('option'); o.value=i; o.textContent=a.name; sel.appendChild(o); });
+  sel.onchange = () => { currentAgent = AGENTS[+sel.value]; renderAll(); };
+  currentAgent = AGENTS[0];
+  // genre filter
+  const gf = document.getElementById('genre-filter');
+  [...new Set(CHANNELS.map(c=>c.genre))].forEach(g => { const o=document.createElement('option'); o.value=g; o.textContent=g; gf.appendChild(o); });
+  gf.onchange = renderAll;
+  // tabs
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('panel-'+b.dataset.tab).classList.add('active');
+  });
+  renderAll();
+  setInterval(renderAll, 60000); // refresh every minute
+}
+init();
+</script>
+</body>
+</html>
