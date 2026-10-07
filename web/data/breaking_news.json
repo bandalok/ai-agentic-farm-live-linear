@@ -1,0 +1,22 @@
+{
+  "scenarios": [
+    {
+      "id": "market-high",
+      "headline": "BREAKING: NASDAQ and S&P 500 Hit All-Time Highs",
+      "detail": "The NASDAQ Composite and S&P 500 both closed at record highs today, fueled by strong tech earnings and AI optimism. The Dow also gained. Analysts are watching whether the rally can hold into next week.",
+      "category": "business"
+    },
+    {
+      "id": "tech-ceo",
+      "headline": "BREAKING: Major Tech CEO Announces Sudden Resignation",
+      "detail": "In a surprise announcement, the CEO of a Fortune 500 tech giant has resigned effective immediately. Board names interim chief. Stock halted in after-hours trading.",
+      "category": "business"
+    },
+    {
+      "id": "election",
+      "headline": "BREAKING: Historic Election Result Declared",
+      "detail": "After a night of dramatic vote counting, a historic result has been declared in the national election. Analysts calling it a turning point. Full analysis ahead.",
+      "category": "politics"
+    }
+  ]
+}
