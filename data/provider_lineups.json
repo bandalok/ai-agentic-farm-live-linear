@@ -1,0 +1,868 @@
+{
+ "ESPN": [
+  [
+   "ESPN",
+   "Flagship sports network"
+  ],
+  [
+   "ESPN2",
+   "Sports news and events"
+  ],
+  [
+   "ESPNU",
+   "College sports"
+  ],
+  [
+   "ESPNews",
+   "24/7 sports news"
+  ],
+  [
+   "ESPN Deportes",
+   "Spanish-language sports"
+  ],
+  [
+   "SEC Network",
+   "Southeastern Conference"
+  ],
+  [
+   "ACC Network",
+   "Atlantic Coast Conference"
+  ],
+  [
+   "Longhorn Network",
+   "Texas Longhorns"
+  ],
+  [
+   "ESPN Classic",
+   "Classic sports moments"
+  ],
+  [
+   "ESPN 8: The Ocho",
+   "Obscure sports"
+  ],
+  [
+   "ESPN Films",
+   "Sports documentaries"
+  ],
+  [
+   "ESPN FC",
+   "Soccer coverage"
+  ],
+  [
+   "ESPN Outdoors",
+   "Hunting and fishing"
+  ],
+  [
+   "ESPN Cricket",
+   "International cricket"
+  ],
+  [
+   "ESPN Tennis",
+   "Tennis tournaments"
+  ],
+  [
+   "ESPN Golf",
+   "Golf tournaments"
+  ],
+  [
+   "ESPN Racing",
+   "Motorsports"
+  ],
+  [
+   "ESPN Olympics",
+   "Olympic sports"
+  ],
+  [
+   "ESPN X Games",
+   "Extreme sports"
+  ],
+  [
+   "ESPN Fantasy",
+   "Fantasy sports shows"
+  ],
+  [
+   "ESPN Betting",
+   "Sports betting analysis"
+  ],
+  [
+   "ESPN Radio TV",
+   "Simulcast radio shows"
+  ],
+  [
+   "ESPN College FB",
+   "College football"
+  ],
+  [
+   "ESPN College BB",
+   "College basketball"
+  ],
+  [
+   "ESPN MLB",
+   "Baseball coverage"
+  ],
+  [
+   "ESPN NBA",
+   "Basketball coverage"
+  ],
+  [
+   "ESPN NFL",
+   "Football coverage"
+  ],
+  [
+   "ESPN NHL",
+   "Hockey coverage"
+  ],
+  [
+   "ESPN Soccer",
+   "Global soccer"
+  ],
+  [
+   "ESPN Women",
+   "Women's sports"
+  ],
+  [
+   "ESPN High School",
+   "Prep sports"
+  ],
+  [
+   "ESPN Esports",
+   "Competitive gaming"
+  ],
+  [
+   "ESPN WWE",
+   "Wrestling entertainment"
+  ],
+  [
+   "ESPN Boxing",
+   "Boxing and MMA"
+  ],
+  [
+   "ESPN Track",
+   "Track and field"
+  ],
+  [
+   "ESPN Swimming",
+   "Aquatic sports"
+  ],
+  [
+   "ESPN Gymnastics",
+   "Gymnastics"
+  ],
+  [
+   "ESPN Volleyball",
+   "Volleyball"
+  ],
+  [
+   "ESPN Lacrosse",
+   "Lacrosse"
+  ],
+  [
+   "ESPN Rugby",
+   "Rugby union/league"
+  ]
+ ],
+ "Plex": [
+  [
+   "Plex Movies",
+   "Free movies 24/7"
+  ],
+  [
+   "Plex TV Classics",
+   "Classic television"
+  ],
+  [
+   "Plex Action",
+   "Action movies"
+  ],
+  [
+   "Plex Comedy",
+   "Comedy movies and shows"
+  ],
+  [
+   "Plex Drama",
+   "Drama series"
+  ],
+  [
+   "Plex Horror",
+   "Horror movies"
+  ],
+  [
+   "Plex Sci-Fi",
+   "Science fiction"
+  ],
+  [
+   "Plex Documentaries",
+   "Doc films"
+  ],
+  [
+   "Plex News",
+   "News headlines"
+  ],
+  [
+   "Plex Sports",
+   "Sports highlights"
+  ],
+  [
+   "Plex Kids",
+   "Children's programming"
+  ],
+  [
+   "Plex Anime",
+   "Anime series"
+  ],
+  [
+   "Plex Reality",
+   "Reality TV"
+  ],
+  [
+   "Plex Crime",
+   "True crime"
+  ],
+  [
+   "Plex Westerns",
+   "Western movies"
+  ],
+  [
+   "Plex Romance",
+   "Romantic films"
+  ],
+  [
+   "Plex Thriller",
+   "Thrillers"
+  ],
+  [
+   "Plex Family",
+   "Family movies"
+  ],
+  [
+   "Plex British",
+   "UK television"
+  ],
+  [
+   "Plex K-Drama",
+   "Korean dramas"
+  ],
+  [
+   "Plex Bollywood",
+   "Indian cinema"
+  ],
+  [
+   "Plex Nollywood",
+   "Nigerian films"
+  ],
+  [
+   "Plex Latino",
+   "Spanish content"
+  ],
+  [
+   "Plex French",
+   "French cinema"
+  ],
+  [
+   "Plex German",
+   "German TV"
+  ],
+  [
+   "Plex Japanese",
+   "Japanese shows"
+  ],
+  [
+   "Plex Chinese",
+   "Chinese dramas"
+  ],
+  [
+   "Plex Retro",
+   "Retro TV"
+  ],
+  [
+   "Plex Game Shows",
+   "Game shows"
+  ],
+  [
+   "Plex Talk Shows",
+   "Talk shows"
+  ],
+  [
+   "Plex Cooking",
+   "Food programming"
+  ],
+  [
+   "Plex Travel",
+   "Travel shows"
+  ],
+  [
+   "Plex Nature",
+   "Nature docs"
+  ],
+  [
+   "Plex History",
+   "History programming"
+  ],
+  [
+   "Plex Science",
+   "Science shows"
+  ],
+  [
+   "Plex Tech",
+   "Technology news"
+  ],
+  [
+   "Plex Music",
+   "Music videos"
+  ],
+  [
+   "Plex Fitness",
+   "Workout shows"
+  ],
+  [
+   "Plex DIY",
+   "Home improvement"
+  ],
+  [
+   "Plex Pets",
+   "Animal shows"
+  ],
+  [
+   "Plex Gaming",
+   "Video game content"
+  ],
+  [
+   "Plex Esports",
+   "Esports tournaments"
+  ],
+  [
+   "Plex Wrestling",
+   "Wrestling"
+  ],
+  [
+   "Plex Boxing",
+   "Boxing matches"
+  ],
+  [
+   "Plex MMA",
+   "MMA fights"
+  ]
+ ],
+ "Disney+": [
+  [
+   "Disney Channel",
+   "Kids and family"
+  ],
+  [
+   "Disney Junior",
+   "Preschool shows"
+  ],
+  [
+   "Disney XD",
+   "Action animation"
+  ],
+  [
+   "Pixar",
+   "Pixar films and shorts"
+  ],
+  [
+   "Marvel",
+   "MCU movies and series"
+  ],
+  [
+   "Star Wars",
+   "Galaxy far away"
+  ],
+  [
+   "National Geographic",
+   "Nature and science"
+  ],
+  [
+   "Nat Geo Wild",
+   "Wildlife"
+  ],
+  [
+   "ESPN on Disney+",
+   "Sports hub"
+  ],
+  [
+   "Disney Princess",
+   "Princess movies"
+  ],
+  [
+   "Disney Villains",
+   "Villain spotlights"
+  ],
+  [
+   "Mickey & Friends",
+   "Classic cartoons"
+  ],
+  [
+   "Disney Animation",
+   "Animated classics"
+  ],
+  [
+   "Disney Live Action",
+   "Live-action films"
+  ],
+  [
+   "Disney Musicals",
+   "Musical films"
+  ],
+  [
+   "Disney Documentaries",
+   "Behind the magic"
+  ],
+  [
+   "Marvel Studios",
+   "MCU deep dives"
+  ],
+  [
+   "Marvel Animation",
+   "Animated Marvel"
+  ],
+  [
+   "X-Men",
+   "Mutant saga"
+  ],
+  [
+   "Avengers",
+   "Earth's mightiest"
+  ],
+  [
+   "Spider-Man",
+   "Web-slinger"
+  ],
+  [
+   "Star Wars Films",
+   "Saga movies"
+  ],
+  [
+   "The Mandalorian",
+   "Mando-verse"
+  ],
+  [
+   "Star Wars Animation",
+   "Clone Wars etc."
+  ],
+  [
+   "Indiana Jones",
+   "Adventure films"
+  ],
+  [
+   "Pirates Caribbean",
+   "Pirate adventures"
+  ],
+  [
+   "Toy Story",
+   "To infinity"
+  ],
+  [
+   "Frozen",
+   "Arendelle"
+  ],
+  [
+   "Lion King",
+   "Pride lands"
+  ],
+  [
+   "Moana",
+   "Ocean adventures"
+  ],
+  [
+   "Encanto",
+   "Madrigal family"
+  ],
+  [
+   "Bluey",
+   "Heeler family"
+  ],
+  [
+   "The Simpsons",
+   "Springfield"
+  ],
+  [
+   "Family Guy",
+   "Quahog"
+  ],
+  [
+   "Bob's Burgers",
+   "Belcher family"
+  ],
+  [
+   "Avatar",
+   "Pandora"
+  ],
+  [
+   "Alien",
+   "Xenomorph"
+  ],
+  [
+   "Predator",
+   "Yautja"
+  ],
+  [
+   "Planet of Apes",
+   "Ape saga"
+  ],
+  [
+   "Die Hard",
+   "Action classics"
+  ],
+  [
+   "Home Alone",
+   "Holiday films"
+  ],
+  [
+   "The Sound of Music",
+   "Classic musicals"
+  ],
+  [
+   "Mary Poppins",
+   "Practically perfect"
+  ],
+  [
+   "Bedknobs",
+   "Classic Disney"
+  ]
+ ],
+ "Prime Video": [
+  [
+   "Prime Originals",
+   "Amazon exclusives"
+  ],
+  [
+   "The Boys",
+   "Superhero satire"
+  ],
+  [
+   "Reacher",
+   "Jack Reacher series"
+  ],
+  [
+   "Fallout",
+   "Wasteland saga"
+  ],
+  [
+   "Rings of Power",
+   "Middle-earth"
+  ],
+  [
+   "The Marvelous Mrs. Maisel",
+   "Comedy drama"
+  ],
+  [
+   "Jack Ryan",
+   "CIA thriller"
+  ],
+  [
+   "Bosch",
+   "Detective series"
+  ],
+  [
+   "The Expanse",
+   "Sci-fi epic"
+  ],
+  [
+   "Invincible",
+   "Animated superhero"
+  ],
+  [
+   "The Terminal List",
+   "Military thriller"
+  ],
+  [
+   "Citadel",
+   "Spy thriller"
+  ],
+  [
+   "Wheel of Time",
+   "Fantasy epic"
+  ],
+  [
+   "Gen V",
+   "Young supes"
+  ],
+  [
+   "Upload",
+   "Digital afterlife"
+  ],
+  [
+   "Good Omens",
+   "Fantasy comedy"
+  ],
+  [
+   "The Peripheral",
+   "Sci-fi thriller"
+  ],
+  [
+   "Outer Range",
+   "Western sci-fi"
+  ],
+  [
+   "Paper Girls",
+   "Time travel"
+  ],
+  [
+   "The Legend of Vox",
+   "Fantasy animation"
+  ],
+  [
+   "Prime Movies",
+   "Blockbuster films"
+  ],
+  [
+   "Prime Action",
+   "Action movies"
+  ],
+  [
+   "Prime Comedy",
+   "Comedy films"
+  ],
+  [
+   "Prime Drama",
+   "Drama films"
+  ],
+  [
+   "Prime Horror",
+   "Horror films"
+  ],
+  [
+   "Prime Romance",
+   "Romance films"
+  ],
+  [
+   "Prime Docs",
+   "Documentaries"
+  ],
+  [
+   "Prime Sports",
+   "Live sports"
+  ],
+  [
+   "Thursday Night Football",
+   "NFL games"
+  ],
+  [
+   "Prime News",
+   "News programming"
+  ],
+  [
+   "Prime Kids",
+   "Children's shows"
+  ],
+  [
+   "Prime Anime",
+   "Anime collection"
+  ],
+  [
+   "Prime British",
+   "UK imports"
+  ],
+  [
+   "Prime Bollywood",
+   "Indian films"
+  ],
+  [
+   "Prime Latino",
+   "Spanish content"
+  ],
+  [
+   "Prime French",
+   "French films"
+  ],
+  [
+   "Prime German",
+   "German series"
+  ],
+  [
+   "Prime Japanese",
+   "Japanese content"
+  ],
+  [
+   "Prime Korean",
+   "K-dramas"
+  ],
+  [
+   "Prime Chinese",
+   "Chinese films"
+  ],
+  [
+   "MGM+",
+   "MGM library"
+  ],
+  [
+   "James Bond",
+   "007 films"
+  ],
+  [
+   "Rocky",
+   "Boxing saga"
+  ],
+  [
+   "Stargate",
+   "Sci-fi franchise"
+  ],
+  [
+   "Vikings",
+   "Norse saga"
+  ]
+ ],
+ "ANoki": [
+  [
+   "Anoki AI News",
+   "AI industry news"
+  ],
+  [
+   "Anoki Tech",
+   "Technology trends"
+  ],
+  [
+   "Anoki Startups",
+   "Startup stories"
+  ],
+  [
+   "Anoki Venture",
+   "VC and funding"
+  ],
+  [
+   "Anoki Coding",
+   "Programming shows"
+  ],
+  [
+   "Anoki Robotics",
+   "Robotics news"
+  ],
+  [
+   "Anoki Space",
+   "Space exploration"
+  ],
+  [
+   "Anoki Climate",
+   "Climate tech"
+  ],
+  [
+   "Anoki Health",
+   "Health tech"
+  ],
+  [
+   "Anoki Fintech",
+   "Financial tech"
+  ],
+  [
+   "Anoki Edtech",
+   "Education tech"
+  ],
+  [
+   "Anoki Gaming",
+   "Game industry"
+  ],
+  [
+   "Anoki Esports",
+   "Competitive gaming"
+  ],
+  [
+   "Anoki Creators",
+   "Creator economy"
+  ],
+  [
+   "Anoki Design",
+   "Design trends"
+  ],
+  [
+   "Anoki Data",
+   "Data science"
+  ],
+  [
+   "Anoki Cloud",
+   "Cloud computing"
+  ],
+  [
+   "Anoki Cybersecurity",
+   "Security news"
+  ],
+  [
+   "Anoki Mobile",
+   "Mobile tech"
+  ],
+  [
+   "Anoki AR/VR",
+   "Immersive tech"
+  ],
+  [
+   "Anoki Blockchain",
+   "Crypto and Web3"
+  ],
+  [
+   "Anoki Biotech",
+   "Biotech advances"
+  ],
+  [
+   "Anoki Energy",
+   "Energy innovation"
+  ],
+  [
+   "Anoki Transport",
+   "Future of transport"
+  ],
+  [
+   "Anoki Smart Home",
+   "IoT and home"
+  ],
+  [
+   "Anoki Wearables",
+   "Wearable tech"
+  ],
+  [
+   "Anoki Drones",
+   "Drone industry"
+  ],
+  [
+   "Anoki 5G",
+   "Next-gen networks"
+  ],
+  [
+   "Anoki Quantum",
+   "Quantum computing"
+  ],
+  [
+   "Anoki Semiconductors",
+   "Chip industry"
+  ],
+  [
+   "Anoki Open Source",
+   "OSS community"
+  ],
+  [
+   "Anoki DevOps",
+   "Dev practices"
+  ],
+  [
+   "Anoki UX",
+   "User experience"
+  ],
+  [
+   "Anoki Product",
+   "Product management"
+  ],
+  [
+   "Anoki Marketing",
+   "Tech marketing"
+  ],
+  [
+   "Anoki Sales",
+   "Sales tech"
+  ],
+  [
+   "Anoki HR Tech",
+   "Future of work"
+  ],
+  [
+   "Anoki Legal Tech",
+   "Legal innovation"
+  ],
+  [
+   "Anoki Real Estate",
+   "Proptech"
+  ],
+  [
+   "Anoki Agtech",
+   "Farm tech"
+  ]
+ ]
+}
