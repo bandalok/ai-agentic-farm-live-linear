@@ -83,6 +83,29 @@
   .modal-card .meta { font-size: 12px; color: #8b98a8; margin-bottom: 20px; }
   .modal-card button { background: #4da3ff; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; cursor: pointer; }
   .footer { padding: 20px 24px; font-size: 12px; color: #5c6b7d; border-top: 1px solid #1c2530; margin-top: 20px; }
+  /* Breaking news popup */
+  .breaking-popup {
+    position: fixed; top: 70px; right: 20px; width: 340px; z-index: 1000;
+    background: #1a2230; border: 1px solid #ff4444; border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(255,68,68,.25); overflow: hidden;
+    animation: slideIn .4s ease-out; cursor: pointer;
+  }
+  @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .breaking-popup.hide { animation: slideOut .3s ease-in forwards; }
+  @keyframes slideOut { to { transform: translateX(400px); opacity: 0; } }
+  .breaking-popup .bp-header {
+    background: #ff4444; color: #fff; font-size: 12px; font-weight: 800;
+    padding: 8px 14px; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .breaking-popup .bp-channel { font-size: 11px; font-weight: 600; opacity: .9; }
+  .breaking-popup .bp-body { padding: 14px; }
+  .breaking-popup .bp-headline { font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+  .breaking-popup .bp-detail { font-size: 13px; color: #b0bac6; line-height: 1.5; }
+  .breaking-btn {
+    background: #ff4444; color: #fff; border: none; border-radius: 6px;
+    padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; margin-left: 10px;
+  }
+  .breaking-btn:hover { background: #dd3333; }
 </style>
 </head>
 <body>
@@ -92,8 +115,10 @@
     <label for="agent">Viewer:</label>
     <select id="agent"></select>
     <span class="agent-tag" id="agent-tag"></span>
+    <button class="breaking-btn" onclick="triggerBreaking()">Breaking News</button>
   </div>
 </header>
+<div id="breaking-container"></div>
 <div class="tabs">
   <button class="active" data-tab="livetv">Live TV</button>
   <button data-tab="sports">Sports Hub</button>
@@ -136,6 +161,7 @@ Content from ESPN, HBO, CNN, and respective networks · Movie & TV data via TMDB
 
 <script>
 let CHANNELS = [], PROGRAMS = [], AGENTS = [], TEAMS = {};
+let BREAKING_NEWS = [], activeBreaking = null;
 // Genre -> local real photo(s). Sports have multiple for variety (picked by title hash).
 const GENRE_IMG = {
   football: ['img/football.jpg','img/football2.jpg','img/football3.jpg','img/football4.jpg','img/football6.jpg','img/football7.jpg','img/football8.jpg'],
@@ -507,14 +533,48 @@ function renderAll() {
   document.getElementById('clock').textContent = d.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 }
 
+function triggerBreaking() {
+  if (!BREAKING_NEWS.length) return;
+  // Pick a random scenario and a random news channel
+  const scenario = BREAKING_NEWS[Math.floor(Math.random() * BREAKING_NEWS.length)];
+  const newsChs = CHANNELS.filter(c => c.genre === 'news');
+  const ch = newsChs.length ? newsChs[Math.floor(Math.random() * newsChs.length)] : { name: 'CNN' };
+  activeBreaking = { ...scenario, channel: ch.name };
+  showBreakingPopup();
+}
+
+function showBreakingPopup() {
+  const container = document.getElementById('breaking-container');
+  container.innerHTML = '';
+  const b = activeBreaking;
+  const d = document.createElement('div');
+  d.className = 'breaking-popup';
+  d.innerHTML = `
+    <div class="bp-header"><span>BREAKING NEWS</span><span class="bp-channel">${escHtml(b.channel)}</span></div>
+    <div class="bp-body">
+      <div class="bp-headline">${escHtml(b.headline.replace('BREAKING: ', ''))}</div>
+      <div class="bp-detail">${escHtml(b.detail)}</div>
+    </div>`;
+  d.onclick = () => {
+    d.classList.add('hide');
+    setTimeout(() => container.innerHTML = '', 300);
+  };
+  container.appendChild(d);
+  // Auto-dismiss after 15 seconds
+  setTimeout(() => {
+    if (d.parentNode) { d.classList.add('hide'); setTimeout(() => container.innerHTML = '', 300); }
+  }, 15000);
+}
+
 async function init() {
-  const [ch, pr, ag, tm] = await Promise.all([
+  const [ch, pr, ag, tm, bn] = await Promise.all([
     fetch('data/channels.json').then(r=>r.json()),
     fetch('data/programs.json').then(r=>r.json()),
     fetch('data/agents.json').then(r=>r.json()),
     fetch('data/teams.json').then(r=>r.json()).catch(()=>({})),
+    fetch('data/breaking_news.json').then(r=>r.json()).catch(()=>({scenarios:[]})),
   ]);
-  CHANNELS = ch; PROGRAMS = pr; AGENTS = ag; TEAMS = tm;
+  CHANNELS = ch; PROGRAMS = pr; AGENTS = ag; TEAMS = tm; BREAKING_NEWS = bn.scenarios || [];
   // agent select
   const sel = document.getElementById('agent');
   AGENTS.forEach((a,i) => { const o=document.createElement('option'); o.value=i; o.textContent=a.name; sel.appendChild(o); });
