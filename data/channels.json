@@ -1,0 +1,702 @@
+[
+ {
+  "id": "ch101",
+  "name": "ESPN",
+  "number": 101,
+  "genre": "sports",
+  "subgenre": "football"
+ },
+ {
+  "id": "ch102",
+  "name": "ESPN2",
+  "number": 102,
+  "genre": "sports",
+  "subgenre": "basketball"
+ },
+ {
+  "id": "ch103",
+  "name": "ESPNU",
+  "number": 103,
+  "genre": "sports",
+  "subgenre": "college"
+ },
+ {
+  "id": "ch104",
+  "name": "ESPNews",
+  "number": 104,
+  "genre": "sports",
+  "subgenre": "studio"
+ },
+ {
+  "id": "ch105",
+  "name": "FS1",
+  "number": 105,
+  "genre": "sports",
+  "subgenre": "football"
+ },
+ {
+  "id": "ch106",
+  "name": "FS2",
+  "number": 106,
+  "genre": "sports",
+  "subgenre": "soccer"
+ },
+ {
+  "id": "ch107",
+  "name": "NFL Network",
+  "number": 107,
+  "genre": "sports",
+  "subgenre": "football"
+ },
+ {
+  "id": "ch108",
+  "name": "NBA TV",
+  "number": 108,
+  "genre": "sports",
+  "subgenre": "basketball"
+ },
+ {
+  "id": "ch109",
+  "name": "MLB Network",
+  "number": 109,
+  "genre": "sports",
+  "subgenre": "baseball"
+ },
+ {
+  "id": "ch110",
+  "name": "NHL Network",
+  "number": 110,
+  "genre": "sports",
+  "subgenre": "hockey"
+ },
+ {
+  "id": "ch111",
+  "name": "Golf Channel",
+  "number": 111,
+  "genre": "sports",
+  "subgenre": "golf"
+ },
+ {
+  "id": "ch112",
+  "name": "Tennis Channel",
+  "number": 112,
+  "genre": "sports",
+  "subgenre": "tennis"
+ },
+ {
+  "id": "ch113",
+  "name": "Olympic Channel",
+  "number": 113,
+  "genre": "sports",
+  "subgenre": "olympics"
+ },
+ {
+  "id": "ch114",
+  "name": "beIN Sports",
+  "number": 114,
+  "genre": "sports",
+  "subgenre": "soccer"
+ },
+ {
+  "id": "ch115",
+  "name": "Stadium",
+  "number": 115,
+  "genre": "sports",
+  "subgenre": "college"
+ },
+ {
+  "id": "ch201",
+  "name": "CNN",
+  "number": 201,
+  "genre": "news",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch202",
+  "name": "Fox News",
+  "number": 202,
+  "genre": "news",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch203",
+  "name": "MSNBC",
+  "number": 203,
+  "genre": "news",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch204",
+  "name": "BBC World News",
+  "number": 204,
+  "genre": "news",
+  "subgenre": "international"
+ },
+ {
+  "id": "ch205",
+  "name": "CNBC",
+  "number": 205,
+  "genre": "news",
+  "subgenre": "business"
+ },
+ {
+  "id": "ch206",
+  "name": "Bloomberg TV",
+  "number": 206,
+  "genre": "news",
+  "subgenre": "business"
+ },
+ {
+  "id": "ch207",
+  "name": "Newsmax",
+  "number": 207,
+  "genre": "news",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch208",
+  "name": "The Weather Channel",
+  "number": 208,
+  "genre": "news",
+  "subgenre": "weather"
+ },
+ {
+  "id": "ch209",
+  "name": "C-SPAN",
+  "number": 209,
+  "genre": "news",
+  "subgenre": "politics"
+ },
+ {
+  "id": "ch210",
+  "name": "C-SPAN2",
+  "number": 210,
+  "genre": "news",
+  "subgenre": "politics"
+ },
+ {
+  "id": "ch211",
+  "name": "NewsNation",
+  "number": 211,
+  "genre": "news",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch212",
+  "name": "Al Jazeera English",
+  "number": 212,
+  "genre": "news",
+  "subgenre": "international"
+ },
+ {
+  "id": "ch301",
+  "name": "HBO",
+  "number": 301,
+  "genre": "movies",
+  "subgenre": "premium"
+ },
+ {
+  "id": "ch302",
+  "name": "HBO 2",
+  "number": 302,
+  "genre": "movies",
+  "subgenre": "premium"
+ },
+ {
+  "id": "ch303",
+  "name": "Cinemax",
+  "number": 303,
+  "genre": "movies",
+  "subgenre": "premium"
+ },
+ {
+  "id": "ch304",
+  "name": "Starz",
+  "number": 304,
+  "genre": "movies",
+  "subgenre": "premium"
+ },
+ {
+  "id": "ch305",
+  "name": "Starz Encore",
+  "number": 305,
+  "genre": "movies",
+  "subgenre": "premium"
+ },
+ {
+  "id": "ch306",
+  "name": "TCM",
+  "number": 306,
+  "genre": "movies",
+  "subgenre": "classics"
+ },
+ {
+  "id": "ch307",
+  "name": "AMC",
+  "number": 307,
+  "genre": "movies",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch308",
+  "name": "FX",
+  "number": 308,
+  "genre": "movies",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch309",
+  "name": "FXX",
+  "number": 309,
+  "genre": "movies",
+  "subgenre": "comedy"
+ },
+ {
+  "id": "ch310",
+  "name": "TNT",
+  "number": 310,
+  "genre": "movies",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch311",
+  "name": "TBS",
+  "number": 311,
+  "genre": "movies",
+  "subgenre": "comedy"
+ },
+ {
+  "id": "ch312",
+  "name": "IFC",
+  "number": 312,
+  "genre": "movies",
+  "subgenre": "indie"
+ },
+ {
+  "id": "ch401",
+  "name": "Cartoon Network",
+  "number": 401,
+  "genre": "kids",
+  "subgenre": "animation"
+ },
+ {
+  "id": "ch402",
+  "name": "Disney Channel",
+  "number": 402,
+  "genre": "kids",
+  "subgenre": "family"
+ },
+ {
+  "id": "ch403",
+  "name": "Disney XD",
+  "number": 403,
+  "genre": "kids",
+  "subgenre": "animation"
+ },
+ {
+  "id": "ch404",
+  "name": "Nickelodeon",
+  "number": 404,
+  "genre": "kids",
+  "subgenre": "family"
+ },
+ {
+  "id": "ch405",
+  "name": "Nick Jr.",
+  "number": 405,
+  "genre": "kids",
+  "subgenre": "preschool"
+ },
+ {
+  "id": "ch406",
+  "name": "PBS Kids",
+  "number": 406,
+  "genre": "kids",
+  "subgenre": "educational"
+ },
+ {
+  "id": "ch407",
+  "name": "Disney Junior",
+  "number": 407,
+  "genre": "kids",
+  "subgenre": "preschool"
+ },
+ {
+  "id": "ch408",
+  "name": "Boomerang",
+  "number": 408,
+  "genre": "kids",
+  "subgenre": "classics"
+ },
+ {
+  "id": "ch409",
+  "name": "Universal Kids",
+  "number": 409,
+  "genre": "kids",
+  "subgenre": "family"
+ },
+ {
+  "id": "ch410",
+  "name": "BabyFirst",
+  "number": 410,
+  "genre": "kids",
+  "subgenre": "preschool"
+ },
+ {
+  "id": "ch501",
+  "name": "NBC",
+  "number": 501,
+  "genre": "entertainment",
+  "subgenre": "broadcast"
+ },
+ {
+  "id": "ch502",
+  "name": "ABC",
+  "number": 502,
+  "genre": "entertainment",
+  "subgenre": "broadcast"
+ },
+ {
+  "id": "ch503",
+  "name": "CBS",
+  "number": 503,
+  "genre": "entertainment",
+  "subgenre": "broadcast"
+ },
+ {
+  "id": "ch504",
+  "name": "Fox",
+  "number": 504,
+  "genre": "entertainment",
+  "subgenre": "broadcast"
+ },
+ {
+  "id": "ch505",
+  "name": "The CW",
+  "number": 505,
+  "genre": "entertainment",
+  "subgenre": "broadcast"
+ },
+ {
+  "id": "ch506",
+  "name": "USA Network",
+  "number": 506,
+  "genre": "entertainment",
+  "subgenre": "cable"
+ },
+ {
+  "id": "ch507",
+  "name": "Bravo",
+  "number": 507,
+  "genre": "entertainment",
+  "subgenre": "reality"
+ },
+ {
+  "id": "ch508",
+  "name": "E!",
+  "number": 508,
+  "genre": "entertainment",
+  "subgenre": "celebrity"
+ },
+ {
+  "id": "ch509",
+  "name": "Comedy Central",
+  "number": 509,
+  "genre": "entertainment",
+  "subgenre": "comedy"
+ },
+ {
+  "id": "ch510",
+  "name": "Adult Swim",
+  "number": 510,
+  "genre": "entertainment",
+  "subgenre": "animation"
+ },
+ {
+  "id": "ch511",
+  "name": "Freeform",
+  "number": 511,
+  "genre": "entertainment",
+  "subgenre": "cable"
+ },
+ {
+  "id": "ch512",
+  "name": "Paramount Network",
+  "number": 512,
+  "genre": "entertainment",
+  "subgenre": "cable"
+ },
+ {
+  "id": "ch601",
+  "name": "Discovery",
+  "number": 601,
+  "genre": "documentary",
+  "subgenre": "nature"
+ },
+ {
+  "id": "ch602",
+  "name": "History",
+  "number": 602,
+  "genre": "documentary",
+  "subgenre": "history"
+ },
+ {
+  "id": "ch603",
+  "name": "National Geographic",
+  "number": 603,
+  "genre": "documentary",
+  "subgenre": "nature"
+ },
+ {
+  "id": "ch604",
+  "name": "Nat Geo Wild",
+  "number": 604,
+  "genre": "documentary",
+  "subgenre": "wildlife"
+ },
+ {
+  "id": "ch605",
+  "name": "PBS",
+  "number": 605,
+  "genre": "documentary",
+  "subgenre": "general"
+ },
+ {
+  "id": "ch606",
+  "name": "Science Channel",
+  "number": 606,
+  "genre": "documentary",
+  "subgenre": "science"
+ },
+ {
+  "id": "ch607",
+  "name": "Investigation Discovery",
+  "number": 607,
+  "genre": "documentary",
+  "subgenre": "crime"
+ },
+ {
+  "id": "ch608",
+  "name": "A&E",
+  "number": 608,
+  "genre": "documentary",
+  "subgenre": "crime"
+ },
+ {
+  "id": "ch609",
+  "name": "Smithsonian Channel",
+  "number": 609,
+  "genre": "documentary",
+  "subgenre": "history"
+ },
+ {
+  "id": "ch610",
+  "name": "Vice TV",
+  "number": 610,
+  "genre": "documentary",
+  "subgenre": "culture"
+ },
+ {
+  "id": "ch701",
+  "name": "HGTV",
+  "number": 701,
+  "genre": "lifestyle",
+  "subgenre": "home"
+ },
+ {
+  "id": "ch702",
+  "name": "Food Network",
+  "number": 702,
+  "genre": "lifestyle",
+  "subgenre": "food"
+ },
+ {
+  "id": "ch703",
+  "name": "TLC",
+  "number": 703,
+  "genre": "lifestyle",
+  "subgenre": "reality"
+ },
+ {
+  "id": "ch704",
+  "name": "Magnolia Network",
+  "number": 704,
+  "genre": "lifestyle",
+  "subgenre": "home"
+ },
+ {
+  "id": "ch705",
+  "name": "Cooking Channel",
+  "number": 705,
+  "genre": "lifestyle",
+  "subgenre": "food"
+ },
+ {
+  "id": "ch706",
+  "name": "OWN",
+  "number": 706,
+  "genre": "lifestyle",
+  "subgenre": "talk"
+ },
+ {
+  "id": "ch707",
+  "name": "Lifetime",
+  "number": 707,
+  "genre": "lifestyle",
+  "subgenre": "movies"
+ },
+ {
+  "id": "ch708",
+  "name": "Hallmark Channel",
+  "number": 708,
+  "genre": "lifestyle",
+  "subgenre": "movies"
+ },
+ {
+  "id": "ch709",
+  "name": "QVC",
+  "number": 709,
+  "genre": "lifestyle",
+  "subgenre": "shopping"
+ },
+ {
+  "id": "ch710",
+  "name": "HSN",
+  "number": 710,
+  "genre": "lifestyle",
+  "subgenre": "shopping"
+ },
+ {
+  "id": "ch801",
+  "name": "MTV",
+  "number": 801,
+  "genre": "music",
+  "subgenre": "pop"
+ },
+ {
+  "id": "ch802",
+  "name": "VH1",
+  "number": 802,
+  "genre": "music",
+  "subgenre": "pop"
+ },
+ {
+  "id": "ch803",
+  "name": "BET",
+  "number": 803,
+  "genre": "music",
+  "subgenre": "hiphop"
+ },
+ {
+  "id": "ch804",
+  "name": "CMT",
+  "number": 804,
+  "genre": "music",
+  "subgenre": "country"
+ },
+ {
+  "id": "ch805",
+  "name": "MTV Classic",
+  "number": 805,
+  "genre": "music",
+  "subgenre": "classics"
+ },
+ {
+  "id": "ch806",
+  "name": "Fuse",
+  "number": 806,
+  "genre": "music",
+  "subgenre": "pop"
+ },
+ {
+  "id": "ch901",
+  "name": "BBC America",
+  "number": 901,
+  "genre": "international",
+  "subgenre": "uk"
+ },
+ {
+  "id": "ch902",
+  "name": "Telemundo",
+  "number": 902,
+  "genre": "international",
+  "subgenre": "spanish"
+ },
+ {
+  "id": "ch903",
+  "name": "Univision",
+  "number": 903,
+  "genre": "international",
+  "subgenre": "spanish"
+ },
+ {
+  "id": "ch904",
+  "name": "UniM\u00e1s",
+  "number": 904,
+  "genre": "international",
+  "subgenre": "spanish"
+ },
+ {
+  "id": "ch905",
+  "name": "Azteca America",
+  "number": 905,
+  "genre": "international",
+  "subgenre": "spanish"
+ },
+ {
+  "id": "ch906",
+  "name": "TV5Monde",
+  "number": 906,
+  "genre": "international",
+  "subgenre": "french"
+ },
+ {
+  "id": "ch907",
+  "name": "DW English",
+  "number": 907,
+  "genre": "international",
+  "subgenre": "german"
+ },
+ {
+  "id": "ch908",
+  "name": "NHK World",
+  "number": 908,
+  "genre": "international",
+  "subgenre": "japanese"
+ },
+ {
+  "id": "ch909",
+  "name": "Zee TV",
+  "number": 909,
+  "genre": "international",
+  "subgenre": "hindi"
+ },
+ {
+  "id": "ch910",
+  "name": "Sony SAB",
+  "number": 910,
+  "genre": "international",
+  "subgenre": "hindi"
+ },
+ {
+  "id": "ch911",
+  "name": "Globo Internacional",
+  "number": 911,
+  "genre": "international",
+  "subgenre": "portuguese"
+ },
+ {
+  "id": "ch912",
+  "name": "RAI Italia",
+  "number": 912,
+  "genre": "international",
+  "subgenre": "italian"
+ },
+ {
+  "id": "ch913",
+  "name": "CCTV-4",
+  "number": 913,
+  "genre": "international",
+  "subgenre": "chinese"
+ }
+]
