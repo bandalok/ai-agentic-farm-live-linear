@@ -657,7 +657,11 @@ function switchFranchise(fid) {
 
 function renderFranchiseHub() {
   const el = document.getElementById('franchise-hub');
-  if (!el || !FRANCHISES[currentFranchise]) return;
+  if (!el) return;
+  if (!FRANCHISES[currentFranchise]) {
+    el.innerHTML = '<p style="color:#5c6b7d;padding:20px;">Loading franchise data... If this persists, please re-download the latest version.</p>';
+    return;
+  }
   const f = FRANCHISES[currentFranchise];
   const now = nowMins(), date = todayStr();
 
