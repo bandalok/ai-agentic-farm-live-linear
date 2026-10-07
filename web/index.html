@@ -120,6 +120,39 @@
   .provider-ch { background: #161d28; border: 1px solid #232e3f; border-radius: 8px; padding: 12px 14px; }
   .provider-ch .ch-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .provider-ch .ch-desc { font-size: 12px; color: #8b98a8; }
+  /* Franchise Hub */
+  .franchise-btn {
+    background: #1a2230; color: #e6ebf2; border: 1px solid #2a3546; border-radius: 8px;
+    padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .franchise-btn.active { background: #002d72; border-color: #002d72; }
+  .franchise-btn:not(:disabled):hover { border-color: #4da3ff; }
+  .fh-section { margin-bottom: 28px; }
+  .fh-section h2 { font-size: 18px; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+  .fh-live-dot { color: #ff4444; font-size: 14px; }
+  .game-card {
+    background: #161d28; border: 1px solid #232e3f; border-radius: 10px; padding: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .game-card.live { border-color: #ff4444; }
+  .game-teams { font-size: 15px; font-weight: 600; }
+  .game-score { font-size: 22px; font-weight: 800; }
+  .game-meta { font-size: 12px; color: #8b98a8; margin-top: 4px; }
+  .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .news-card { background: #161d28; border-radius: 10px; padding: 16px; border-left: 3px solid #ff4444; margin-bottom: 10px; cursor: pointer; }
+  .news-card:hover { background: #1a2230; }
+  .news-card .nc-headline { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .news-card .nc-detail { font-size: 13px; color: #b0bac6; line-height: 1.5; }
+  .news-card .nc-time { font-size: 11px; color: #5c6b7d; margin-top: 8px; }
+  .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .collection-card { background: #161d28; border-radius: 10px; padding: 14px; border: 1px solid #232e3f; }
+  .collection-card .cc-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .collection-card .cc-meta { font-size: 11px; color: #5c6b7d; margin-bottom: 8px; }
+  .collection-card .cc-desc { font-size: 12px; color: #8b98a8; line-height: 1.4; }
+  .standings-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .standings-table th { text-align: left; padding: 8px 12px; color: #5c6b7d; font-size: 12px; border-bottom: 1px solid #232e3f; }
+  .standings-table td { padding: 10px 12px; border-bottom: 1px solid #1c2530; }
+  .standings-table tr:hover td { background: #161d28; }
 </style>
 </head>
 <body>
@@ -154,14 +187,12 @@
 </div>
 
 <div class="tab-panel" id="panel-sports">
-  <div class="sports-section">
-    <h2><span style="color:#ff4444">●</span> Live now</h2>
-    <div id="sports-apps"></div>
+  <div class="franchise-nav" style="display:flex;gap:10px;margin-bottom:20px;">
+    <button class="franchise-btn active" data-franchise="mlb" onclick="switchFranchise('mlb')">MLB</button>
+    <button class="franchise-btn" data-franchise="nfl" onclick="switchFranchise('nfl')" disabled style="opacity:.4">NFL (soon)</button>
+    <button class="franchise-btn" data-franchise="nba" onclick="switchFranchise('nba')" disabled style="opacity:.4">NBA (soon)</button>
   </div>
-  <div class="sports-section">
-    <h2>Upcoming games</h2>
-    <div class="tiles" id="upcoming-tiles"></div>
-  </div>
+  <div id="franchise-hub"></div>
 </div>
 
 <div class="tab-panel" id="panel-admin">
@@ -186,6 +217,8 @@ Content from ESPN, HBO, CNN, and respective networks · Movie & TV data via TMDB
 let CHANNELS = [], PROGRAMS = [], AGENTS = [], TEAMS = {};
 let BREAKING_NEWS = [], activeBreaking = null;
 let PROVIDER_LINEUPS = {};
+let FRANCHISES = {};
+let currentFranchise = 'mlb';
 
 const PROVIDER_COLORS = {
   'ESPN': '#cc0000', 'Plex': '#e5a00d', 'Disney+': '#113ccf', 'Prime Video': '#00a8e1', 'ANoki': '#7c3aed'
@@ -556,7 +589,7 @@ function renderAll() {
   renderPicks();
   const gf = document.getElementById('genre-filter').value;
   renderEPG('epg', gf ? CHANNELS.filter(c=>c.genre===gf) : CHANNELS);
-  renderSports();
+  renderFranchiseHub();
   renderAdmin();
   const d = new Date();
   document.getElementById('clock').textContent = d.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
@@ -614,6 +647,103 @@ function showBreakingPopup() {
   }, 15000);
 }
 
+function switchFranchise(fid) {
+  currentFranchise = fid;
+  document.querySelectorAll('.franchise-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.franchise === fid);
+  });
+  renderFranchiseHub();
+}
+
+function renderFranchiseHub() {
+  const el = document.getElementById('franchise-hub');
+  if (!el || !FRANCHISES[currentFranchise]) return;
+  const f = FRANCHISES[currentFranchise];
+  const now = nowMins(), date = todayStr();
+
+  // Get live baseball games from schedule
+  const liveGames = [], upcomingGames = [];
+  for (const ch of CHANNELS.filter(c => c.genre === 'sports' && c.subgenre === 'baseball')) {
+    for (const s of buildDaySchedule(ch, date)) {
+      if (!/MLB:/i.test(s.prog.title)) continue;
+      if (s.start <= now && s.end > now) {
+        const sc = simScore(s.prog, s.start, now);
+        liveGames.push({ ...s, score: sc });
+      } else if (s.start > now && s.start < now + 480) {
+        upcomingGames.push(s);
+      }
+    }
+  }
+  // Dedupe
+  const seen = new Set();
+  const uniqLive = liveGames.filter(g => { if (seen.has(g.prog.title)) return false; seen.add(g.prog.title); return true; });
+  seen.clear();
+  const uniqUpcoming = upcomingGames.filter(g => { if (seen.has(g.prog.title)) return false; seen.add(g.prog.title); return true; });
+
+  el.innerHTML = `
+    <div class="fh-section">
+      <h2><span class="fh-live-dot">●</span> Live Games</h2>
+      <div class="game-grid">
+        ${uniqLive.slice(0, 4).map(g => `
+          <div class="game-card live">
+            <div><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
+              <div class="game-meta">${g.score ? g.score.clock : 'Live'} · ${escHtml(g.ch.name)}</div></div>
+            <div class="game-score">${g.score ? `${g.score.sa} - ${g.score.sb}` : ''}</div>
+          </div>`).join('') || '<p style="color:#5c6b7d">No live games right now.</p>'}
+      </div>
+    </div>
+    <div class="fh-section">
+      <h2>Recent Results</h2>
+      <div class="game-grid">
+        ${f.previous_games.slice(0, 6).map(g => `
+          <div class="game-card">
+            <div><div class="game-teams">${escHtml(g.away_abbr)} @ ${escHtml(g.home_abbr)}</div>
+              <div class="game-meta">${escHtml(g.date)} · Final</div></div>
+            <div class="game-score">${g.away_score} - ${g.home_score}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="fh-section">
+      <h2>Upcoming</h2>
+      <div class="game-grid">
+        ${uniqUpcoming.slice(0, 4).map(g => `
+          <div class="game-card">
+            <div><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
+              <div class="game-meta">${fmtTime(g.start)} · ${escHtml(g.ch.name)}</div></div>
+          </div>`).join('') || '<p style="color:#5c6b7d">No upcoming games scheduled.</p>'}
+      </div>
+    </div>
+    <div class="fh-section">
+      <h2>MLB Breaking News</h2>
+      ${f.news.map(n => `
+        <div class="news-card">
+          <div class="nc-headline">${escHtml(n.headline)}</div>
+          <div class="nc-detail">${escHtml(n.detail)}</div>
+          <div class="nc-time">${escHtml(n.time)}</div>
+        </div>`).join('')}
+    </div>
+    <div class="fh-section">
+      <h2>Baseball Collection — Movies & Shows</h2>
+      <div class="collection-grid">
+        ${f.collection.map(c => `
+          <div class="collection-card">
+            <div class="cc-title">${escHtml(c.title)}</div>
+            <div class="cc-meta">${escHtml(c.type)} · ${c.year}</div>
+            <div class="cc-desc">${escHtml(c.desc)}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="fh-section">
+      <h2>Standings</h2>
+      <table class="standings-table">
+        <tr><th>Team</th><th>W</th><th>L</th><th>PCT</th></tr>
+        ${[...f.teams].sort((a,b) => (b.wins/(b.wins+b.losses)) - (a.wins/(a.wins+a.losses))).map(t => `
+          <tr><td><strong>${escHtml(t.name)}</strong> <span style="color:#5c6b7d">${t.abbr}</span></td>
+          <td>${t.wins}</td><td>${t.losses}</td><td>${(t.wins/(t.wins+t.losses)).toFixed(3).replace('0.', '.')}</td></tr>`).join('')}
+      </table>
+    </div>`;
+}
+
 function renderAdmin() {
   const el = document.getElementById('provider-lineups');
   if (!el) return;
@@ -638,15 +768,16 @@ function renderAdmin() {
 }
 
 async function init() {
-  const [ch, pr, ag, tm, bn, pl] = await Promise.all([
+  const [ch, pr, ag, tm, bn, pl, fr] = await Promise.all([
     fetch('data/channels.json').then(r=>r.json()),
     fetch('data/programs.json').then(r=>r.json()),
     fetch('data/agents.json').then(r=>r.json()),
     fetch('data/teams.json').then(r=>r.json()).catch(()=>({})),
     fetch('data/breaking_news.json').then(r=>r.json()).catch(()=>({scenarios:[]})),
     fetch('data/provider_lineups.json').then(r=>r.json()).catch(()=>({})),
+    fetch('data/franchises.json').then(r=>r.json()).catch(()=>({})),
   ]);
-  CHANNELS = ch; PROGRAMS = pr; AGENTS = ag; TEAMS = tm; BREAKING_NEWS = bn.scenarios || []; PROVIDER_LINEUPS = pl;
+  CHANNELS = ch; PROGRAMS = pr; AGENTS = ag; TEAMS = tm; BREAKING_NEWS = bn.scenarios || []; PROVIDER_LINEUPS = pl; FRANCHISES = fr;
   // agent select
   const sel = document.getElementById('agent');
   AGENTS.forEach((a,i) => { const o=document.createElement('option'); o.value=i; o.textContent=a.name; sel.appendChild(o); });
