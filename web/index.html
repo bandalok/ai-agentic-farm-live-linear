@@ -589,8 +589,8 @@ function renderAll() {
   renderPicks();
   const gf = document.getElementById('genre-filter').value;
   renderEPG('epg', gf ? CHANNELS.filter(c=>c.genre===gf) : CHANNELS);
-  renderFranchiseHub();
-  renderAdmin();
+  try { renderFranchiseHub(); } catch(e) { console.error('Franchise hub error:', e); }
+  try { renderAdmin(); } catch(e) { console.error('Admin error:', e); }
   const d = new Date();
   document.getElementById('clock').textContent = d.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 }
@@ -665,19 +665,21 @@ function renderFranchiseHub() {
   const f = FRANCHISES[currentFranchise];
   const now = nowMins(), date = todayStr();
 
-  // Get live baseball games from schedule
+  // Get live baseball games from schedule (defensive)
   const liveGames = [], upcomingGames = [];
-  for (const ch of CHANNELS.filter(c => c.genre === 'sports' && c.subgenre === 'baseball')) {
-    for (const s of buildDaySchedule(ch, date)) {
-      if (!/MLB:/i.test(s.prog.title)) continue;
-      if (s.start <= now && s.end > now) {
-        const sc = simScore(s.prog, s.start, now);
-        liveGames.push({ ...s, score: sc });
-      } else if (s.start > now && s.start < now + 480) {
-        upcomingGames.push(s);
+  try {
+    for (const ch of CHANNELS.filter(c => c.genre === 'sports' && c.subgenre === 'baseball')) {
+      for (const s of buildDaySchedule(ch, date)) {
+        if (!s.prog || !s.prog.title || !/MLB:/i.test(s.prog.title)) continue;
+        if (s.start <= now && s.end > now) {
+          const sc = simScore(s.prog, s.start, now);
+          liveGames.push({ ...s, score: sc });
+        } else if (s.start > now && s.start < now + 480) {
+          upcomingGames.push(s);
+        }
       }
     }
-  }
+  } catch(e) { console.error('Game schedule error:', e); }
   // Dedupe
   const seen = new Set();
   const uniqLive = liveGames.filter(g => { if (seen.has(g.prog.title)) return false; seen.add(g.prog.title); return true; });
