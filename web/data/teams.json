@@ -1,0 +1,74 @@
+{
+ "Chicago Bears": {
+  "logo": "img/logos/foo_chi.png",
+  "sport": "football"
+ },
+ "Dallas Cowboys": {
+  "logo": "img/logos/foo_dal.png",
+  "sport": "football"
+ },
+ "Seattle Seahawks": {
+  "logo": "img/logos/foo_sea.png",
+  "sport": "football"
+ },
+ "Miami Dolphins": {
+  "logo": "img/logos/foo_mia.png",
+  "sport": "football"
+ },
+ "Denver Broncos": {
+  "logo": "img/logos/foo_den.png",
+  "sport": "football"
+ },
+ "New England Patriots": {
+  "logo": "img/logos/foo_ne.png",
+  "sport": "football"
+ },
+ "LA Lakers": {
+  "logo": "img/logos/bas_lal.png",
+  "sport": "basketball"
+ },
+ "Chicago Bulls": {
+  "logo": "img/logos/bas_chi.png",
+  "sport": "basketball"
+ },
+ "New York Knicks": {
+  "logo": "img/logos/bas_nyk.png",
+  "sport": "basketball"
+ },
+ "Houston Rockets": {
+  "logo": "img/logos/bas_hou.png",
+  "sport": "basketball"
+ },
+ "Phoenix Suns": {
+  "logo": "img/logos/bas_phx.png",
+  "sport": "basketball"
+ },
+ "Boston Celtics": {
+  "logo": "img/logos/bas_bos.png",
+  "sport": "basketball"
+ },
+ "LA Galaxy": {
+  "logo": "",
+  "sport": "soccer"
+ },
+ "Seattle Sounders": {
+  "logo": "",
+  "sport": "soccer"
+ },
+ "Portland Timbers": {
+  "logo": "",
+  "sport": "soccer"
+ },
+ "Inter Miami": {
+  "logo": "",
+  "sport": "soccer"
+ },
+ "Austin FC": {
+  "logo": "",
+  "sport": "soccer"
+ },
+ "NY Red Bulls": {
+  "logo": "",
+  "sport": "soccer"
+ }
+}
