@@ -185,6 +185,7 @@
   <div class="epg-wrap">
     <div class="epg-controls">
       <select id="genre-filter"><option value="">All genres</option></select>
+      <button id="smart-sort-btn" onclick="toggleSmartSort()" style="background:#2a3f5f;border:none;color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;">✨ Smart Sort: Off</button>
       <span id="clock" style="font-size:13px;color:#8b98a8"></span>
     </div>
     <div class="epg-scroll"><div class="epg-grid" id="epg"></div></div>
@@ -438,6 +439,87 @@ function renderPicks() {
   });
 }
 
+let smartSortEnabled = false;
+let currentPersonality = 'sports'; // default
+
+// Personality preferences: genre -> weight multiplier
+const PERSONALITY_WEIGHTS = {
+  sports: { sports: 3.0, news: 1.2, movies: 0.8, entertainment: 1.0, kids: 0.5, documentary: 0.9 },
+  news: { news: 3.0, sports: 1.0, movies: 0.7, entertainment: 0.8, kids: 0.4, documentary: 1.5 },
+  movies: { movies: 3.0, entertainment: 2.0, sports: 0.7, news: 0.8, kids: 0.8, documentary: 1.2 },
+};
+
+const PERSONALITY_NAMES = {
+  sports: "Marcus 'Coach' Bell",
+  news: "Sarah Chen",
+  movies: "James Whitfield",
+};
+
+function getTimeOfDayBoost(genre, hour) {
+  // Morning (5-10): news up. Midday (10-16): mixed. Prime (19-23): entertainment/movies/sports. Late (23-5): movies
+  if (hour >= 5 && hour < 10) {
+    return genre === 'news' ? 2.0 : 1.0;
+  } else if (hour >= 19 && hour < 23) {
+    return (genre === 'movies' || genre === 'entertainment' || genre === 'sports') ? 1.8 : 1.0;
+  } else if (hour >= 23 || hour < 5) {
+    return genre === 'movies' ? 1.5 : 0.8;
+  }
+  return 1.0;
+}
+
+function getBreakingNewsBoost(channel) {
+  // If breaking news was pushed, boost news channels
+  try {
+    const bn = JSON.parse(localStorage.getItem('epg_breaking_news') || 'null');
+    if (bn && bn.items && bn.items.length && channel.genre === 'news') {
+      return 2.5;
+    }
+  } catch(e) {}
+  return 1.0;
+}
+
+function smartSortChannels(channels) {
+  const hour = new Date().getHours();
+  const weights = PERSONALITY_WEIGHTS[currentPersonality] || {};
+  
+  return [...channels].map(ch => {
+    const genre = ch.genre || 'entertainment';
+    const personalityBoost = weights[genre] || 1.0;
+    const timeBoost = getTimeOfDayBoost(genre, hour);
+    const breakingBoost = getBreakingNewsBoost(ch);
+    // Live sports boost for sports personality
+    const liveBoost = (currentPersonality === 'sports' && genre === 'sports') ? 1.5 : 1.0;
+    
+    const score = personalityBoost * timeBoost * breakingBoost * liveBoost;
+    
+    // Reason for ranking
+    let reason = '';
+    if (breakingBoost > 1 && genre === 'news') reason = '🔴 Breaking news';
+    else if (personalityBoost >= 2.5) reason = '⭐ For you';
+    else if (timeBoost >= 1.8) reason = '📺 Prime time';
+    else if (timeBoost >= 1.5) reason = '🌙 Late night pick';
+    
+    return { ch, score, reason };
+  })
+  .sort((a, b) => b.score - a.score)
+  .map(({ch, reason}) => ({...ch, _smartReason: reason}));
+}
+
+function toggleSmartSort() {
+  smartSortEnabled = !smartSortEnabled;
+  const btn = document.getElementById('smart-sort-btn');
+  btn.textContent = smartSortEnabled ? '✨ Smart Sort: On' : '✨ Smart Sort: Off';
+  btn.style.background = smartSortEnabled ? '#1d9bf0' : '#2a3f5f';
+  // Re-render EPG
+  const gf = document.getElementById('genre-filter').value;
+  let channels = gf ? CHANNELS.filter(c => c.genre === gf) : CHANNELS;
+  if (smartSortEnabled) channels = smartSortChannels(channels);
+  renderEPG('epg', channels);
+}
+
+// Hook personality switcher to update smart sort
+const origSetPersonality = typeof setPersonality !== 'undefined' ? setPersonality : null;
+
 function renderEPG(gridId, channelList) {
   const grid = document.getElementById(gridId);
   const now = nowMins(), date = todayStr();
@@ -456,7 +538,8 @@ function renderEPG(gridId, channelList) {
     const todaySched = buildDaySchedule(ch, date);
     const tomorrowSched = buildDaySchedule(ch, tomorrowStr).map(s => ({...s, start: s.start + 1440, end: s.end + 1440}));
     const sched = [...todaySched, ...tomorrowSched].filter(s => s.end > startMin && s.start < startMin+totalMin);
-    html += `<div class="epg-row"><div class="epg-ch"><div class="num">${ch.number}</div><div class="name">${ch.name}</div></div><div class="epg-track">`;
+    const reasonBadge = ch._smartReason ? `<div style="font-size:10px;color:#1d9bf0;font-weight:600;">${ch._smartReason}</div>` : '';
+    html += `<div class="epg-row"><div class="epg-ch"><div class="num">${ch.number}</div><div class="name">${ch.name}</div>${reasonBadge}</div><div class="epg-track">`;
     for (const s of sched) {
       const isLive = s.start <= now && s.end > now;
       const left = Math.max(0, (s.start-startMin)/totalMin*100);
@@ -1124,7 +1207,17 @@ async function init() {
   // agent select
   const sel = document.getElementById('agent');
   AGENTS.forEach((a,i) => { const o=document.createElement('option'); o.value=i; o.textContent=a.name; sel.appendChild(o); });
-  sel.onchange = () => { currentAgent = AGENTS[+sel.value]; renderAll(); };
+  sel.onchange = () => {
+    currentAgent = AGENTS[+sel.value];
+    // Map agent to personality for smart sort
+    const name = currentAgent.name.toLowerCase();
+    if (name.includes('marcus') || name.includes('coach')) currentPersonality = 'sports';
+    else if (name.includes('sarah')) currentPersonality = 'news';
+    else if (name.includes('james')) currentPersonality = 'movies';
+    renderAll();
+    // Re-apply smart sort if enabled
+    if (smartSortEnabled) toggleSmartSort(), toggleSmartSort();
+  };
   currentAgent = AGENTS[0];
   // genre filter
   const gf = document.getElementById('genre-filter');
