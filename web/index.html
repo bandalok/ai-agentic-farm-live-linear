@@ -210,6 +210,11 @@
   <button onclick="closeModal()">Close</button>
 </div></div>
 
+<div class="modal" id="channel-modal"><div class="modal-card" style="max-width:480px;">
+  <div id="cm-content"></div>
+  <button onclick="closeChannelModal()" style="margin-top:16px;">Close</button>
+</div></div>
+
 <div class="footer">EPG Farm — live linear TV guide. 100 channels · 7-day guide · 10 viewer agents.<br>
 Content from ESPN, HBO, CNN, and respective networks · Movie & TV data via TMDB · Schedules simulated for demo.</div>
 
@@ -332,6 +337,44 @@ function openModal(prog, ch, start, end) {
 }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') closeModal(); });
+
+// Channel management modal for Agent Admin
+function openChannelModal(ch, provider) {
+  const cm = document.getElementById('cm-content');
+  const typeBadge = ch.content_type === 'linear'
+    ? '<span style="background:#ff4444;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;">LIVE / LINEAR</span>'
+    : '<span style="background:#2a3546;color:#8b98a8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;">ON-DEMAND</span>';
+  cm.innerHTML = `
+    <img src="${ch.image}" alt="" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:14px;" onerror="this.style.display='none'">
+    <h2 style="margin:0 0 6px;">${escHtml(ch.name)}</h2>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+      ${typeBadge}
+      <span style="font-size:13px;color:#8b98a8;">Ch ${ch.number} · ${escHtml(provider)}</span>
+    </div>
+    <p style="font-size:14px;color:#b0bac6;line-height:1.5;margin-bottom:16px;">${escHtml(ch.desc)}</p>
+    <div style="background:#161d28;border-radius:8px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:13px;margin-bottom:10px;">
+        <strong>Shows in EPG:</strong>
+        <span id="cm-epg-status" style="color:${ch.in_epg ? '#4caf50' : '#8b98a8'};">${ch.in_epg ? 'Yes' : 'No'}</span>
+      </div>
+      <button id="cm-toggle-epg" style="background:${ch.in_epg ? '#5a1a1a' : '#1a5a2a'};color:#fff;border:none;border-radius:6px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">
+        ${ch.in_epg ? 'Remove from EPG' : 'Add to EPG'}
+      </button>
+    </div>
+    <div style="font-size:12px;color:#5c6b7d;">
+      Content type: ${ch.content_type === 'linear' ? 'Live linear channel — appears in the EPG grid with a schedule.' : 'On-demand — available in the provider app, not in the linear EPG.'}
+    </div>`;
+  document.getElementById('channel-modal').classList.add('open');
+  document.getElementById('cm-toggle-epg').onclick = () => {
+    ch.in_epg = !ch.in_epg;
+    // Update the card in the grid
+    renderAdmin();
+    // Refresh modal
+    openChannelModal(ch, provider);
+  };
+}
+function closeChannelModal() { document.getElementById('channel-modal').classList.remove('open'); }
+document.getElementById('channel-modal').addEventListener('click', e => { if(e.target.id==='channel-modal') closeChannelModal(); });
 
 function scoreForAgent(prog, agent) {
   let s = (agent.genres[prog.genre] || 0.1);
@@ -772,40 +815,77 @@ function renderAdmin() {
   const el = document.getElementById('provider-lineups');
   if (!el) return;
   el.innerHTML = '';
-  Object.keys(PROVIDER_LINEUPS).forEach(provider => {
-    const channels = PROVIDER_LINEUPS[provider];
-    const color = PROVIDER_COLORS[provider] || '#4da3ff';
-    const block = document.createElement('div');
-    block.className = 'provider-block';
-    const gridId = 'prov-grid-' + provider.replace(/[^a-z0-9]/gi, '');
-    block.innerHTML = `
-      <h3><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${color}"></span>
-        Channel lineup from ${escHtml(provider)} <span class="provider-count">${channels.length} channels</span></h3>
-      <div class="provider-grid" id="${gridId}"></div>`;
-    el.appendChild(block);
-    const grid = block.querySelector('#' + gridId);
-    channels.forEach(ch => {
-      const d = document.createElement('div');
-      d.className = 'provider-ch';
-      d.style.cursor = 'pointer';
-      d.innerHTML = `
-        <div style="position:relative;">
-          <img src="${ch.image}" alt="" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px;"
-               onerror="this.style.display='none'">
-          <span style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.7);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;">${ch.number}</span>
-        </div>
-        <div class="ch-name">${escHtml(ch.name)}</div>
-        <div class="ch-desc">${escHtml(ch.desc)}</div>
-        <div style="font-size:11px;color:#5c6b7d;margin-top:6px;">${escHtml(provider)}</div>`;
-      d.onclick = () => {
-        // Show detail popup using a synthetic program object
-        const prog = { title: ch.name, desc: ch.desc, genre: 'entertainment', subgenre: 'general', poster: ch.image };
-        const chObj = { name: ch.name, number: ch.number };
-        openModal(prog, chObj, 0, 60);
-      };
-      grid.appendChild(d);
-    });
+  // Global filter
+  const filterBar = document.createElement('div');
+  filterBar.style.cssText = 'display:flex;gap:10px;margin-bottom:20px;align-items:center;';
+  filterBar.innerHTML = `
+    <span style="font-size:13px;color:#8b98a8;">Show:</span>
+    <button class="admin-filter active" data-f="all" style="background:#1a2230;border:1px solid #2a3546;color:#e6ebf2;border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;">All</button>
+    <button class="admin-filter" data-f="linear" style="background:#1a2230;border:1px solid #2a3546;color:#e6ebf2;border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;">Live/Linear</button>
+    <button class="admin-filter" data-f="on-demand" style="background:#1a2230;border:1px solid #2a3546;color:#e6ebf2;border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;">On-Demand</button>`;
+  el.appendChild(filterBar);
+  let currentFilter = 'all';
+  filterBar.querySelectorAll('.admin-filter').forEach(b => {
+    b.onclick = () => {
+      currentFilter = b.dataset.f;
+      filterBar.querySelectorAll('.admin-filter').forEach(x => {
+        x.classList.toggle('active', x === b);
+        x.style.background = x === b ? '#002d72' : '#1a2230';
+      });
+      renderProviderBlocks();
+    };
   });
+
+  const container = document.createElement('div');
+  el.appendChild(container);
+
+  function renderProviderBlocks() {
+    container.innerHTML = '';
+    Object.keys(PROVIDER_LINEUPS).forEach(provider => {
+      const allChannels = PROVIDER_LINEUPS[provider];
+      const channels = currentFilter === 'all' ? allChannels : allChannels.filter(c => c.content_type === currentFilter);
+      if (!channels.length) return;
+      const linearCount = allChannels.filter(c => c.content_type === 'linear').length;
+      const vodCount = allChannels.length - linearCount;
+      const color = PROVIDER_COLORS[provider] || '#4da3ff';
+      const block = document.createElement('div');
+      block.className = 'provider-block';
+      const gridId = 'prov-grid-' + provider.replace(/[^a-z0-9]/gi, '');
+      block.innerHTML = `
+        <h3><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${color}"></span>
+          ${escHtml(provider)}
+          <span class="provider-count">${allChannels.length} channels</span>
+          <span style="font-size:12px;font-weight:400;margin-left:8px;">
+            <span style="color:#ff4444;">● ${linearCount} live</span>
+            <span style="color:#8b98a8;margin-left:8px;">○ ${vodCount} on-demand</span>
+          </span>
+        </h3>
+        <div class="provider-grid" id="${gridId}"></div>`;
+      container.appendChild(block);
+      const grid = block.querySelector('#' + gridId);
+      channels.forEach(ch => {
+        const d = document.createElement('div');
+        d.className = 'provider-ch';
+        d.style.cursor = 'pointer';
+        const typeBadge = ch.content_type === 'linear'
+          ? '<span style="background:#ff4444;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;">LIVE</span>'
+          : '<span style="background:#2a3546;color:#8b98a8;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;">ON-DEMAND</span>';
+        d.innerHTML = `
+          <div style="position:relative;">
+            <img src="${ch.image}" alt="" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px;"
+                 onerror="this.style.display='none'">
+            <span style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.7);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;">${ch.number}</span>
+            <span style="position:absolute;top:6px;right:6px;">${typeBadge}</span>
+          </div>
+          <div class="ch-name">${escHtml(ch.name)}</div>
+          <div class="ch-desc">${escHtml(ch.desc)}</div>
+          <div style="font-size:11px;color:#5c6b7d;margin-top:6px;">${escHtml(provider)} · ${ch.in_epg ? 'in EPG' : 'not in EPG'}</div>`;
+        d.onclick = () => openChannelModal(ch, provider);
+        grid.appendChild(d);
+      });
+    });
+  }
+  renderProviderBlocks();
 }
 
 async function init() {
