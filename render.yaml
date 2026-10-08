@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: epg-farm
+    runtime: static
+    repo: https://github.com/bandalok/ai-agentic-farm-live-linear
+    buildCommand: ""
+    staticPublishPath: web
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
