@@ -1059,5 +1059,70 @@ async function init() {
 }
 init();
 </script>
+
+<!-- Breaking News Admin Panel -->
+<div id="bn-admin" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;overflow:auto;">
+  <div style="max-width:800px;margin:40px auto;background:#0f1419;border-radius:12px;padding:24px;border:1px solid #2a3f5f;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h2 style="margin:0;">Breaking News - Admin Control</h2>
+      <button onclick="document.getElementById('bn-admin').style.display='none'" style="background:#2a3f5f;border:none;color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;">Close</button>
+    </div>
+    <div style="margin-bottom:16px;">
+      <button onclick="scanNews()" style="background:#1a73e8;border:none;color:#fff;padding:10px 20px;border-radius:6px;cursor:pointer;margin-right:8px;">Scan Feeds</button>
+      <button onclick="pushApproved()" style="background:#34a853;border:none;color:#fff;padding:10px 20px;border-radius:6px;cursor:pointer;">Push Approved to EPG</button>
+    </div>
+    <div id="bn-queue"></div>
+  </div>
+</div>
+<script>
+async function loadQueue() {
+  try {
+    const r = await fetch('data/bn_queue.json');
+    const q = await r.json();
+    const el = document.getElementById('bn-queue');
+    const pending = q.filter(i => i.status === 'pending');
+    const approved = q.filter(i => i.status === 'approved');
+    el.innerHTML = `
+      <h3>Pending Review (${pending.length})</h3>
+      ${pending.map(i => `
+        <div style="background:#1a2332;border-radius:8px;padding:14px;margin-bottom:10px;border-left:4px solid ${i.is_breaking ? '#ff4444' : '#5c6b7d'};">
+          <div style="font-size:11px;color:#8b98a8;">${i.source} · ${i.detected_at}</div>
+          <div style="font-weight:600;margin:6px 0;">${i.title}</div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="approveNews('${i.id}')" style="background:#34a853;border:none;color:#fff;padding:6px 14px;border-radius:4px;cursor:pointer;">Approve & Push</button>
+            <button onclick="rejectNews('${i.id}')" style="background:#5c6b7d;border:none;color:#fff;padding:6px 14px;border-radius:4px;cursor:pointer;">Reject</button>
+          </div>
+        </div>`).join('') || '<p style="color:#5c6b7d">No pending items. Click Scan Feeds.</p>'}
+      <h3>Approved (${approved.length})</h3>
+      ${approved.map(i => `
+        <div style="background:#1a2332;border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid #34a853;">
+          <div style="font-size:11px;color:#8b98a8;">${i.source}</div>
+          <div style="font-weight:600;">${i.title}</div>
+        </div>`).join('')}
+    `;
+  } catch(e) {
+    document.getElementById('bn-queue').innerHTML = '<p style="color:#5c6b7d">Queue not available. Run the agent first.</p>';
+  }
+}
+function approveNews(id) { updateStatus(id, 'approved'); }
+function rejectNews(id) { updateStatus(id, 'rejected'); }
+async function updateStatus(id, status) {
+  // In a real deployment this would POST to a backend
+  // For demo, we update via the agent script
+  alert(`Would set ${id} to ${status}. Run: python3 agents/breaking-news/admin.py ${status} ${id}`);
+}
+function scanNews() { alert('Run: python3 agents/breaking-news/agent.py scan'); }
+function pushApproved() { alert('Run: python3 agents/breaking-news/agent.py push'); }
+// Add admin button to header
+document.addEventListener('DOMContentLoaded', () => {
+  const header = document.querySelector('header') || document.body;
+  const btn = document.createElement('button');
+  btn.textContent = 'News Admin';
+  btn.style.cssText = 'background:#2a3f5f;border:none;color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;margin-left:8px;';
+  btn.onclick = () => { document.getElementById('bn-admin').style.display='block'; loadQueue(); };
+  const viewer = document.querySelector('.viewer-selector') || header;
+  viewer.appendChild(btn);
+});
+</script>
 </body>
 </html>
