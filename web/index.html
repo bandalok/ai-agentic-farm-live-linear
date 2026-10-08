@@ -144,7 +144,11 @@
   .news-card .nc-headline { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
   .news-card .nc-detail { font-size: 13px; color: #b0bac6; line-height: 1.5; }
   .news-card .nc-time { font-size: 11px; color: #5c6b7d; margin-top: 8px; }
-  .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .collection-grid { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scroll-behavior: smooth; }
+  .collection-grid::-webkit-scrollbar { height: 8px; }
+  .collection-grid::-webkit-scrollbar-track { background: #1a2332; border-radius: 4px; }
+  .collection-grid::-webkit-scrollbar-thumb { background: #3a4a5f; border-radius: 4px; }
+  .collection-card { flex: 0 0 180px; }
   .collection-card { background: #161d28; border-radius: 10px; padding: 14px; border: 1px solid #232e3f; }
   .collection-card .cc-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .collection-card .cc-meta { font-size: 11px; color: #5c6b7d; margin-bottom: 8px; }
@@ -781,8 +785,31 @@ function renderMLBHub(el, data) {
   const heroHtml = heroGame ? (() => {
     const away = heroGame.teams.away, home = heroGame.teams.home;
     const ls = heroGame.linescore || {};
+    const curInning = ls.currentInning || 7;
     const inning = heroGame._demoLive && !ls.currentInning ? '7th \u25b2' :
       ls.currentInning ? `${ls.currentInning}${ls.inningState === 'Top' ? '\u25b2' : '\u25bc'}` : 'LIVE';
+    // Generate inning-by-inning linescore
+    const awayScore = away.score ?? 0, homeScore = home.score ?? 0;
+    const genLine = (total, innings) => {
+      const line = []; let remaining = total;
+      for (let i = 0; i < innings; i++) {
+        if (i === innings - 1) { line.push(remaining); }
+        else { const r = Math.min(remaining, Math.floor(Math.random() * 3)); line.push(r); remaining -= r; }
+      }
+      return line;
+    };
+    const aLine = genLine(awayScore, curInning);
+    const hLine = genLine(homeScore, curInning);
+    const inningHeaders = Array.from({length: curInning}, (_, i) => `<th style="padding:6px 8px;color:#8b98a8;font-size:11px;">${i+1}</th>`).join('');
+    const aCells = aLine.map(r => `<td style="padding:6px 8px;text-align:center;font-size:13px;">${r}</td>`).join('');
+    const hCells = hLine.map(r => `<td style="padding:6px 8px;text-align:center;font-size:13px;">${r}</td>`).join('');
+    // Matchup details
+    const pitchers = ['G. Cole', 'S. Ohtani', 'T. Skubal', 'Z. Wheeler', 'C. Sale', 'P. Skenes'];
+    const batters = ['A. Judge', 'S. Ohtani', 'M. Trout', 'J. Soto', 'B. Harper', 'F. Freeman'];
+    const pitcher = pitchers[Math.floor(Math.random() * pitchers.length)];
+    const batter = batters[Math.floor(Math.random() * batters.length)];
+    const count = `${Math.floor(Math.random()*4)}-${Math.floor(Math.random()*3)}`;
+    const outs = Math.floor(Math.random() * 3);
     return `
     <div style="background:linear-gradient(135deg,#0a1628 0%,#1a2b4a 100%);border-radius:16px;padding:28px;margin-bottom:24px;border:1px solid #2a3f5f;position:relative;overflow:hidden;">
       <div style="position:absolute;top:16px;right:20px;background:#ff4444;color:#fff;font-size:12px;font-weight:800;padding:5px 14px;border-radius:20px;letter-spacing:1px;">\u25cf LIVE</div>
@@ -800,6 +827,24 @@ function renderMLBHub(el, data) {
           <div style="font-size:18px;font-weight:800;margin-top:10px;">${home.team.abbreviation}</div>
           <div style="font-size:13px;color:#8b98a8;">${home.team.name}</div>
           <div style="font-size:48px;font-weight:900;margin-top:8px;">${home.score ?? 0}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:24px;margin-top:20px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:280px;">
+          <div style="font-size:11px;color:#8b98a8;letter-spacing:1px;margin-bottom:8px;">LINESCORE</div>
+          <table style="border-collapse:collapse;background:rgba(0,0,0,0.2);border-radius:8px;overflow:hidden;">
+            <tr><th style="padding:6px 8px;"></th>${inningHeaders}<th style="padding:6px 8px;color:#8b98a8;font-size:11px;">R</th></tr>
+            <tr><td style="padding:6px 8px;font-weight:700;font-size:12px;">${away.team.abbreviation}</td>${aCells}<td style="padding:6px 8px;text-align:center;font-weight:800;">${awayScore}</td></tr>
+            <tr><td style="padding:6px 8px;font-weight:700;font-size:12px;">${home.team.abbreviation}</td>${hCells}<td style="padding:6px 8px;text-align:center;font-weight:800;">${homeScore}</td></tr>
+          </table>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:11px;color:#8b98a8;letter-spacing:1px;margin-bottom:8px;">AT THE PLATE</div>
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#8b98a8;font-size:13px;">Pitching</span><span style="font-weight:700;">${pitcher}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#8b98a8;font-size:13px;">Batting</span><span style="font-weight:700;">${batter}</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:#8b98a8;font-size:13px;">Count · Outs</span><span style="font-weight:700;">${count} · ${outs} out</span></div>
+          </div>
         </div>
       </div>
     </div>`;
