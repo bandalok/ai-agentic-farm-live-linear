@@ -1110,21 +1110,56 @@ async function loadMLBCollections() {
 }
 
 async function loadMLBNews() {
-  // Use ESPN API for real MLB news (free, no auth)
+  // Use ESPN API for real MLB news (free, no auth), fallback to MLB.com RSS
+  const el = document.getElementById('mlb-news');
+  if (!el) return;
   try {
-    const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/mlb/news?limit=5');
+    const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news?limit=5');
     const d = await r.json();
-    const el = document.getElementById('mlb-news');
-    if (!el) return;
-    el.innerHTML = (d.articles || []).map(a => `
-      <div class="news-card" style="display:flex;gap:14px;align-items:flex-start;cursor:pointer;" onclick="window.open('${a.links.web.href}','_blank')">
-        ${a.images?.[0]?.url ? `<img src="${a.images[0].url}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
-        <div><div class="nc-headline">${escHtml(a.headline)}</div>
-        <div class="nc-detail">${escHtml(a.description || '')}</div>
-        <div class="nc-time">${escHtml(a.published || '')} · ESPN</div></div>
-      </div>`).join('') || '<p style="color:#5c6b7d">No news available.</p>';
+    if (d.articles && d.articles.length) {
+      el.innerHTML = d.articles.map(a => `
+        <div class="news-card" style="display:flex;gap:14px;align-items:flex-start;cursor:pointer;" onclick="window.open('${a.links.web.href}','_blank')">
+          ${a.images?.[0]?.url ? `<img src="${a.images[0].url}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
+          <div><div class="nc-headline">${escHtml(a.headline)}</div>
+          <div class="nc-detail">${escHtml(a.description || '')}</div>
+          <div class="nc-time">${escHtml(a.published || '')} · ESPN</div></div>
+        </div>`).join('');
+      return;
+    }
+    throw new Error('ESPN empty');
   } catch(e) {
-    console.error('MLB news error:', e);
+    console.log('ESPN failed, trying MLB.com RSS:', e.message);
+  }
+  // Fallback: MLB.com official RSS via CORS proxy
+  try {
+    const proxies = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?url='];
+    let xml = null;
+    for (const px of proxies) {
+      try {
+        const r = await fetch(px + encodeURIComponent('https://www.mlb.com/feeds/news/rss.xml'), {signal: AbortSignal.timeout(10000)});
+        if (r.ok) { xml = await r.text(); break; }
+      } catch(e) { continue; }
+    }
+    if (!xml) throw new Error('RSS proxies failed');
+    const doc = new DOMParser().parseFromString(xml, 'text/xml');
+    const items = [...doc.querySelectorAll('item')].slice(0, 5);
+    el.innerHTML = items.map(it => {
+      const title = it.querySelector('title')?.textContent || '';
+      const link = it.querySelector('link')?.textContent || '#';
+      const desc = it.querySelector('description')?.textContent?.replace(/<[^>]*>/g, '').slice(0, 120) || '';
+      const pub = it.querySelector('pubDate')?.textContent?.slice(0, 16) || '';
+      const img = it.querySelector('enclosure[type^="image"]')?.getAttribute('url') || '';
+      return `
+        <div class="news-card" style="display:flex;gap:14px;align-items:flex-start;cursor:pointer;" onclick="window.open('${escHtml(link)}','_blank')">
+          ${img ? `<img src="${escHtml(img)}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
+          <div><div class="nc-headline">${escHtml(title)}</div>
+          <div class="nc-detail">${escHtml(desc)}</div>
+          <div class="nc-time">${escHtml(pub)} · MLB.com</div></div>
+        </div>`;
+    }).join('') || '<p style="color:#5c6b7d">No news available.</p>';
+  } catch(e2) {
+    console.error('MLB news error:', e2);
+    el.innerHTML = '<p style="color:#5c6b7d">News temporarily unavailable.</p>';
   }
 }
 function renderAdmin() {
