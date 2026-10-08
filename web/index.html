@@ -1210,7 +1210,7 @@ async function init() {
     const vr = await fetch('VERSION');
     const vv = (await vr.text()).trim();
     const vel = document.getElementById('build-ver');
-    if (vel) vel.textContent = 'v' + vv;
+    if (vel && vr.ok && /^[0-9]+\.[0-9.]+$/.test(vv)) vel.textContent = 'v' + vv;
   } catch(e) {}
   const [ch, pr, ag, tm, bn, pl, fr] = await Promise.all([
     fetch('data/channels.json').then(r=>r.json()),
