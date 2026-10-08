@@ -698,119 +698,140 @@ function switchFranchise(fid) {
   renderFranchiseHub();
 }
 
-function renderFranchiseHub() {
+// Real MLB data from MLB Stats API (free, no auth)
+const MLB_API = 'https://statsapi.mlb.com/api/v1';
+let mlbCache = { schedule: null, standings: null, teams: null, ts: 0 };
+
+async function fetchMLB(endpoint) {
+  const r = await fetch(MLB_API + endpoint);
+  return r.json();
+}
+
+async function loadMLBData() {
+  const now = Date.now();
+  if (mlbCache.schedule && (now - mlbCache.ts) < 60000) return mlbCache; // 1-min cache
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const [sched, standings] = await Promise.all([
+      fetchMLB(`/schedule?sportId=1&date=${today}&hydrate=team,linescore`),
+      fetchMLB(`/standings?leagueId=103,104&season=2026&standingsTypes=regularSeason`),
+    ]);
+    mlbCache = { schedule: sched, standings, ts: now, live: true };
+  } catch(e) {
+    // Fall back to bundled real data
+    console.log('MLB live API failed, using bundled data');
+    const bundled = await fetch('data/mlb_live.json').then(r => r.json()).catch(() => null);
+    if (bundled) {
+      mlbCache = { schedule: bundled.schedule, standings: bundled.standings, schedule_yesterday: bundled.schedule_yesterday, ts: now, live: false };
+    } else {
+      mlbCache = { schedule: null, standings: null, ts: now, live: false };
+    }
+  }
+  return mlbCache;
+}
+
+function teamLogoUrl(abbr) {
+  return `https://a.espncdn.com/i/teamlogos/mlb/500/${abbr.toLowerCase()}.png`;
+}
+
+async function renderFranchiseHub() {
   const el = document.getElementById('franchise-hub');
   if (!el) return;
-  if (!FRANCHISES[currentFranchise]) {
-    el.innerHTML = '<p style="color:#5c6b7d;padding:20px;">Loading franchise data...</p>';
+  if (currentFranchise !== 'mlb') {
+    el.innerHTML = '<p style="color:#5c6b7d;padding:20px;">Coming soon.</p>';
     return;
   }
-  const f = FRANCHISES[currentFranchise];
-  const now = nowMins(), date = todayStr();
-
-  // Get live baseball games from schedule (defensive)
-  const liveGames = [], upcomingGames = [];
+  el.innerHTML = '<p style="color:#5c6b7d;padding:20px;">Loading live MLB data...</p>';
   try {
-    for (const ch of CHANNELS.filter(c => c.genre === 'sports' && c.subgenre === 'baseball')) {
-      for (const s of buildDaySchedule(ch, date)) {
-        if (!s.prog || !s.prog.title || !/MLB:/i.test(s.prog.title)) continue;
-        const item = { ...s, ch };
-        if (s.start <= now && s.end > now) {
-          const sc = simScore(s.prog, s.start, now);
-          liveGames.push({ ...item, score: sc });
-        } else if (s.start > now && s.start < now + 480) {
-          upcomingGames.push(item);
-        }
-      }
-    }
-  } catch(e) { console.error('Game schedule error:', e); }
-  // Dedupe
-  const seen = new Set();
-  const uniqLive = liveGames.filter(g => { if (seen.has(g.prog.title)) return false; seen.add(g.prog.title); return true; });
-  seen.clear();
-  const uniqUpcoming = upcomingGames.filter(g => { if (seen.has(g.prog.title)) return false; seen.add(g.prog.title); return true; });
+    const data = await loadMLBData();
+    renderMLBHub(el, data);
+  } catch(e) {
+    console.error('MLB API error:', e);
+    el.innerHTML = '<p style="color:#ff6666;padding:20px;">Could not load live MLB data. Check connection.</p>';
+  }
+}
+
+function renderMLBHub(el, data) {
+  const games = [];
+  (data.schedule?.dates || []).forEach(d => (d.games || []).forEach(g => games.push(g)));
+  // Include yesterday's games for more results
+  (data.schedule_yesterday?.dates || []).forEach(d => (d.games || []).forEach(g => games.push(g)));
+  const live = games.filter(g => /In Progress|Live/i.test(g.status.detailedState));
+  const upcoming = games.filter(g => /Scheduled|Pre-Game|Warmup/i.test(g.status.detailedState));
+  const final = games.filter(g => /Final/i.test(g.status.detailedState));
+  const liveLabel = data.live ? 'real-time via MLB Stats API' : 'from Oct 7, 2026 (live API unavailable)';
+
+  const gameCard = (g) => {
+    const away = g.teams.away, home = g.teams.home;
+    const status = g.status.detailedState;
+    const isLive = /In Progress|Live/i.test(status);
+    const ls = g.linescore || {};
+    const inningInfo = ls.currentInning ? `${ls.currentInning}${ls.inningState === 'Top' ? '▲' : ls.inningState === 'Bottom' ? '▼' : ''}` : status;
+    return `
+      <div class="game-card ${isLive ? 'live' : ''}">
+        <img src="${teamLogoUrl(away.team.abbreviation)}" alt="" style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'">
+        <div style="flex:1;">
+          <div class="game-teams">${away.team.abbreviation} ${away.score ?? ''} @ ${home.team.abbreviation} ${home.score ?? ''}</div>
+          <div class="game-meta">${away.team.name} at ${home.team.name}</div>
+          <div class="game-meta" style="color:${isLive ? '#ff4444' : '#8b98a8'};font-weight:${isLive ? '700' : '400'};">${isLive ? '● ' : ''}${inningInfo}</div>
+        </div>
+        <img src="${teamLogoUrl(home.team.abbreviation)}" alt="" style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'">
+      </div>`;
+  };
+
+  // Standings
+  const DIV_NAMES = {200:'AL West',201:'AL East',202:'AL Central',203:'NL West',204:'NL East',205:'NL Central'};
+  let standingsHtml = '';
+  (data.standings?.records || []).forEach(div => {
+    const divName = DIV_NAMES[div.division.id] || div.league.name || 'Division';
+    const rows = (div.teamRecords || []).map(tr => `
+      <tr><td><strong>${tr.team.name}</strong></td><td>${tr.wins}</td><td>${tr.losses}</td><td>${tr.winningPercentage}</td><td>${tr.gamesBack}</td></tr>`).join('');
+    standingsHtml += `<h3 style="font-size:15px;margin:16px 0 8px;">${divName}</h3>
+      <table class="standings-table"><tr><th>Team</th><th>W</th><th>L</th><th>PCT</th><th>GB</th></tr>${rows}</table>`;
+  });
 
   el.innerHTML = `
     <div class="fh-section">
-      <h2><span class="fh-live-dot">●</span> Live Games</h2>
-      <div class="game-grid">
-        ${uniqLive.slice(0, 4).map((g, i) => `
-          <div class="game-card live">
-            <img src="img/baseball${(i % 6) + 1}.jpg" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:8px;"
-                 onerror="this.style.display='none'">
-            <div style="flex:1;"><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
-              <div class="game-meta">${g.score ? g.score.clock : 'Live'} · ${escHtml(g.ch.name)}</div></div>
-            <div class="game-score">${g.score ? `${g.score.sa} - ${g.score.sb}` : ''}</div>
-          </div>`).join('') || '<p style="color:#5c6b7d">No live games right now.</p>'}
-      </div>
+      <h2><span class="fh-live-dot">●</span> Live Games <span style="font-size:12px;color:#5c6b7d;font-weight:400;">— ${liveLabel}</span></h2>
+      <div class="game-grid">${live.map(gameCard).join('') || '<p style="color:#5c6b7d">No live games right now.</p>'}</div>
     </div>
     <div class="fh-section">
       <h2>Upcoming Games</h2>
-      <div class="game-grid">
-        ${(f.upcoming_games || []).slice(0, 8).map((g, i) => `
-          <div class="game-card">
-            <img src="${g.img || 'img/baseball' + ((i % 6) + 1) + '.jpg'}" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
-                 onerror="this.style.display='none'">
-            <div style="flex:1;"><div class="game-teams">${escHtml(g.away_abbr)} @ ${escHtml(g.home_abbr)}</div>
-              <div class="game-meta">${escHtml(g.date)} · ${escHtml(g.time)}</div>
-              <div class="game-meta" style="font-size:11px;">${escHtml(g.away)} at ${escHtml(g.home)}</div></div>
-          </div>`).join('')}
-        ${uniqUpcoming.slice(0, 2).map((g, i) => `
-          <div class="game-card">
-            <img src="img/baseball${((i + 4) % 6) + 1}.jpg" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
-                 onerror="this.style.display='none'">
-            <div><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
-              <div class="game-meta">${fmtTime(g.start)} · ${escHtml(g.ch.name)}</div></div>
-          </div>`).join('')}
-      </div>
+      <div class="game-grid">${upcoming.map(gameCard).join('') || '<p style="color:#5c6b7d">No upcoming games today.</p>'}</div>
     </div>
     <div class="fh-section">
       <h2>Recent Results</h2>
-      <div class="game-grid">
-        ${f.previous_games.slice(0, 6).map((g, i) => `
-          <div class="game-card">
-            <img src="img/baseball${((i + 2) % 6) + 1}.jpg" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
-                 onerror="this.style.display='none'">
-            <div style="flex:1;"><div class="game-teams">${escHtml(g.away_abbr)} @ ${escHtml(g.home_abbr)}</div>
-              <div class="game-meta">${escHtml(g.date)} · Final</div></div>
-            <div class="game-score">${g.away_score} - ${g.home_score}</div>
-          </div>`).join('')}
-      </div>
+      <div class="game-grid">${final.map(gameCard).join('') || '<p style="color:#5c6b7d">No completed games today.</p>'}</div>
+    </div>
+    <div class="fh-section">
+      <h2>Standings <span style="font-size:12px;color:#5c6b7d;font-weight:400;">— 2026 season</span></h2>
+      ${standingsHtml || '<p style="color:#5c6b7d">Standings unavailable.</p>'}
     </div>
     <div class="fh-section">
       <h2>MLB Breaking News</h2>
-      ${f.news.map(n => `
-        <div class="news-card" style="display:flex;gap:14px;align-items:flex-start;">
-          ${n.img ? `<img src="${n.img}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
-          <div><div class="nc-headline">${escHtml(n.headline)}</div>
-          <div class="nc-detail">${escHtml(n.detail)}</div>
-          <div class="nc-time">${escHtml(n.time)}</div></div>
-        </div>`).join('')}
-    </div>
-    ${Object.keys(f.collections || {}).map(colName => `
-    <div class="fh-section">
-      <h2>${escHtml(colName)}</h2>
-      <div class="collection-grid">
-        ${f.collections[colName].map(c => `
-          <div class="collection-card">
-            ${c.img ? `<img src="${c.img}" alt="" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:10px;" onerror="this.style.display='none'">` : ''}
-            <div class="cc-title">${escHtml(c.title)}</div>
-            <div class="cc-meta">${escHtml(c.type)} · ${c.year}</div>
-            <div class="cc-desc">${escHtml(c.desc)}</div>
-          </div>`).join('')}
-      </div>
-    </div>`).join('')}
-    <div class="fh-section">
-      <h2>Standings</h2>
-      <table class="standings-table">
-        <tr><th>Team</th><th>W</th><th>L</th><th>PCT</th></tr>
-        ${[...f.teams].sort((a,b) => (b.wins/(b.wins+b.losses)) - (a.wins/(a.wins+a.losses))).map(t => `
-          <tr><td><strong>${escHtml(t.name)}</strong> <span style="color:#5c6b7d">${t.abbr}</span></td>
-          <td>${t.wins}</td><td>${t.losses}</td><td>${(t.wins/(t.wins+t.losses)).toFixed(3).replace('0.', '.')}</td></tr>`).join('')}
-      </table>
+      <div id="mlb-news"></div>
     </div>`;
+  loadMLBNews();
 }
 
+async function loadMLBNews() {
+  // Use ESPN API for real MLB news (free, no auth)
+  try {
+    const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/mlb/news?limit=5');
+    const d = await r.json();
+    const el = document.getElementById('mlb-news');
+    if (!el) return;
+    el.innerHTML = (d.articles || []).map(a => `
+      <div class="news-card" style="display:flex;gap:14px;align-items:flex-start;cursor:pointer;" onclick="window.open('${a.links.web.href}','_blank')">
+        ${a.images?.[0]?.url ? `<img src="${a.images[0].url}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
+        <div><div class="nc-headline">${escHtml(a.headline)}</div>
+        <div class="nc-detail">${escHtml(a.description || '')}</div>
+        <div class="nc-time">${escHtml(a.published || '')} · ESPN</div></div>
+      </div>`).join('') || '<p style="color:#5c6b7d">No news available.</p>';
+  } catch(e) {
+    console.error('MLB news error:', e);
+  }
+}
 function renderAdmin() {
   const el = document.getElementById('provider-lineups');
   if (!el) return;
