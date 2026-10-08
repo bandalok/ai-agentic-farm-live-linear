@@ -691,9 +691,11 @@ function renderFranchiseHub() {
     <div class="fh-section">
       <h2><span class="fh-live-dot">●</span> Live Games</h2>
       <div class="game-grid">
-        ${uniqLive.slice(0, 4).map(g => `
+        ${uniqLive.slice(0, 4).map((g, i) => `
           <div class="game-card live">
-            <div><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
+            <img src="img/baseball${(i % 6) + 1}.jpg" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:8px;"
+                 onerror="this.style.display='none'">
+            <div style="flex:1;"><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
               <div class="game-meta">${g.score ? g.score.clock : 'Live'} · ${escHtml(g.ch.name)}</div></div>
             <div class="game-score">${g.score ? `${g.score.sa} - ${g.score.sb}` : ''}</div>
           </div>`).join('') || '<p style="color:#5c6b7d">No live games right now.</p>'}
@@ -702,9 +704,11 @@ function renderFranchiseHub() {
     <div class="fh-section">
       <h2>Recent Results</h2>
       <div class="game-grid">
-        ${f.previous_games.slice(0, 6).map(g => `
+        ${f.previous_games.slice(0, 6).map((g, i) => `
           <div class="game-card">
-            <div><div class="game-teams">${escHtml(g.away_abbr)} @ ${escHtml(g.home_abbr)}</div>
+            <img src="img/baseball${((i + 2) % 6) + 1}.jpg" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
+                 onerror="this.style.display='none'">
+            <div style="flex:1;"><div class="game-teams">${escHtml(g.away_abbr)} @ ${escHtml(g.home_abbr)}</div>
               <div class="game-meta">${escHtml(g.date)} · Final</div></div>
             <div class="game-score">${g.away_score} - ${g.home_score}</div>
           </div>`).join('')}
@@ -713,8 +717,10 @@ function renderFranchiseHub() {
     <div class="fh-section">
       <h2>Upcoming</h2>
       <div class="game-grid">
-        ${uniqUpcoming.slice(0, 4).map(g => `
+        ${uniqUpcoming.slice(0, 4).map((g, i) => `
           <div class="game-card">
+            <img src="img/baseball${((i + 4) % 6) + 1}.jpg" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
+                 onerror="this.style.display='none'">
             <div><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
               <div class="game-meta">${fmtTime(g.start)} · ${escHtml(g.ch.name)}</div></div>
           </div>`).join('') || '<p style="color:#5c6b7d">No upcoming games scheduled.</p>'}
@@ -723,23 +729,26 @@ function renderFranchiseHub() {
     <div class="fh-section">
       <h2>MLB Breaking News</h2>
       ${f.news.map(n => `
-        <div class="news-card">
-          <div class="nc-headline">${escHtml(n.headline)}</div>
+        <div class="news-card" style="display:flex;gap:14px;align-items:flex-start;">
+          ${n.img ? `<img src="${n.img}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
+          <div><div class="nc-headline">${escHtml(n.headline)}</div>
           <div class="nc-detail">${escHtml(n.detail)}</div>
-          <div class="nc-time">${escHtml(n.time)}</div>
+          <div class="nc-time">${escHtml(n.time)}</div></div>
         </div>`).join('')}
     </div>
+    ${Object.keys(f.collections || {}).map(colName => `
     <div class="fh-section">
-      <h2>Baseball Collection — Movies & Shows</h2>
+      <h2>${escHtml(colName)}</h2>
       <div class="collection-grid">
-        ${f.collection.map(c => `
+        ${f.collections[colName].map(c => `
           <div class="collection-card">
+            ${c.img ? `<img src="${c.img}" alt="" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:10px;" onerror="this.style.display='none'">` : ''}
             <div class="cc-title">${escHtml(c.title)}</div>
             <div class="cc-meta">${escHtml(c.type)} · ${c.year}</div>
             <div class="cc-desc">${escHtml(c.desc)}</div>
           </div>`).join('')}
       </div>
-    </div>
+    </div>`).join('')}
     <div class="fh-section">
       <h2>Standings</h2>
       <table class="standings-table">
