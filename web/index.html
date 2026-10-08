@@ -192,7 +192,6 @@
     <button class="franchise-btn" data-franchise="nfl" onclick="switchFranchise('nfl')" disabled style="opacity:.4">NFL (soon)</button>
     <button class="franchise-btn" data-franchise="nba" onclick="switchFranchise('nba')" disabled style="opacity:.4">NBA (soon)</button>
   </div>
-  <div id="franchise-debug" style="font-size:12px;color:#5c6b7d;margin-bottom:10px;"></div>
   <div id="franchise-hub"></div>
 </div>
 
@@ -658,14 +657,9 @@ function switchFranchise(fid) {
 
 function renderFranchiseHub() {
   const el = document.getElementById('franchise-hub');
-  const dbg = document.getElementById('franchise-debug');
   if (!el) return;
-  // Debug info
-  if (dbg) {
-    dbg.textContent = `Debug: FRANCHISES keys=[${Object.keys(FRANCHISES).join(',')}] current=${currentFranchise} hasData=${!!FRANCHISES[currentFranchise]}`;
-  }
   if (!FRANCHISES[currentFranchise]) {
-    el.innerHTML = '<p style="color:#5c6b7d;padding:20px;">Loading franchise data... If this persists, please re-download the latest version.</p>';
+    el.innerHTML = '<p style="color:#5c6b7d;padding:20px;">Loading franchise data...</p>';
     return;
   }
   const f = FRANCHISES[currentFranchise];
@@ -677,11 +671,12 @@ function renderFranchiseHub() {
     for (const ch of CHANNELS.filter(c => c.genre === 'sports' && c.subgenre === 'baseball')) {
       for (const s of buildDaySchedule(ch, date)) {
         if (!s.prog || !s.prog.title || !/MLB:/i.test(s.prog.title)) continue;
+        const item = { ...s, ch };
         if (s.start <= now && s.end > now) {
           const sc = simScore(s.prog, s.start, now);
-          liveGames.push({ ...s, score: sc });
+          liveGames.push({ ...item, score: sc });
         } else if (s.start > now && s.start < now + 480) {
-          upcomingGames.push(s);
+          upcomingGames.push(item);
         }
       }
     }
