@@ -702,6 +702,26 @@ function renderFranchiseHub() {
       </div>
     </div>
     <div class="fh-section">
+      <h2>Upcoming Games</h2>
+      <div class="game-grid">
+        ${(f.upcoming_games || []).slice(0, 8).map((g, i) => `
+          <div class="game-card">
+            <img src="${g.img || 'img/baseball' + ((i % 6) + 1) + '.jpg'}" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
+                 onerror="this.style.display='none'">
+            <div style="flex:1;"><div class="game-teams">${escHtml(g.away_abbr)} @ ${escHtml(g.home_abbr)}</div>
+              <div class="game-meta">${escHtml(g.date)} · ${escHtml(g.time)}</div>
+              <div class="game-meta" style="font-size:11px;">${escHtml(g.away)} at ${escHtml(g.home)}</div></div>
+          </div>`).join('')}
+        ${uniqUpcoming.slice(0, 2).map((g, i) => `
+          <div class="game-card">
+            <img src="img/baseball${((i + 4) % 6) + 1}.jpg" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
+                 onerror="this.style.display='none'">
+            <div><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
+              <div class="game-meta">${fmtTime(g.start)} · ${escHtml(g.ch.name)}</div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="fh-section">
       <h2>Recent Results</h2>
       <div class="game-grid">
         ${f.previous_games.slice(0, 6).map((g, i) => `
@@ -712,18 +732,6 @@ function renderFranchiseHub() {
               <div class="game-meta">${escHtml(g.date)} · Final</div></div>
             <div class="game-score">${g.away_score} - ${g.home_score}</div>
           </div>`).join('')}
-      </div>
-    </div>
-    <div class="fh-section">
-      <h2>Upcoming</h2>
-      <div class="game-grid">
-        ${uniqUpcoming.slice(0, 4).map((g, i) => `
-          <div class="game-card">
-            <img src="img/baseball${((i + 4) % 6) + 1}.jpg" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:6px;"
-                 onerror="this.style.display='none'">
-            <div><div class="game-teams">${escHtml(g.prog.title.replace('MLB: ', ''))}</div>
-              <div class="game-meta">${fmtTime(g.start)} · ${escHtml(g.ch.name)}</div></div>
-          </div>`).join('') || '<p style="color:#5c6b7d">No upcoming games scheduled.</p>'}
       </div>
     </div>
     <div class="fh-section">
