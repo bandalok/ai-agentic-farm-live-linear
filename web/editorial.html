@@ -297,6 +297,22 @@ async function scanFeeds() {
         const title = item.querySelector('title')?.textContent?.trim();
         if (!title || existingTitles.has(title) || title.length < 20) continue;
         const isBreaking = /breaking|urgent|developing|just in|alert/i.test(title);
+        // Try to get real article image from RSS
+        let imgUrl = null;
+        const mediaContent = item.querySelector('content[url], thumbnail[url]');
+        if (mediaContent) imgUrl = mediaContent.getAttribute('url');
+        if (!imgUrl) {
+          const enclosure = item.querySelector('enclosure[type^="image"]');
+          if (enclosure) imgUrl = enclosure.getAttribute('url');
+        }
+        if (!imgUrl) {
+          // Try namespaced media tags via getElementsByTagName
+          const mediaTags = item.getElementsByTagNameNS('*', 'content');
+          for (const mt of mediaTags) {
+            const u = mt.getAttribute('url');
+            if (u && /\.(jpg|jpeg|png|webp)/i.test(u)) { imgUrl = u; break; }
+          }
+        }
         tweets.unshift({
           id: 'rss-' + Date.now() + '-' + newCount,
           source: feed.source,
@@ -305,6 +321,7 @@ async function scanFeeds() {
           time: 'now',
           breaking: isBreaking,
           category: detectCategory(title),
+          image: imgUrl,
           status: 'pending'
         });
         existingTitles.add(title);
@@ -372,7 +389,8 @@ function pushToEPG() {
       title: t.text,
       time: t.time,
       breaking: t.breaking,
-      category: t.category
+      category: t.category,
+      image: t.image || null
     }))
   };
   localStorage.setItem('epg_breaking_news', JSON.stringify(bnData));
@@ -414,6 +432,7 @@ function render() {
             ${t.breaking ? '<span class="breaking-badge">BREAKING</span>' : ''}
             <span class="cat-badge cat-${t.category.toLowerCase()}">${t.category}</span>
           </div>
+          ${t.image ? `<img src="${t.image}" style="width:100%;border-radius:12px;margin-bottom:12px;max-height:200px;object-fit:cover;" onerror="this.style.display='none'">` : ''}
           <div class="tweet-text">${t.text}</div>
           ${t.status !== 'rejected' ? `
           <div class="tweet-actions">
