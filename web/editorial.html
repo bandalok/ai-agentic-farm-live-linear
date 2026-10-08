@@ -253,7 +253,7 @@ async function addTweet() {
   save(); render();
 }
 
-function scanFeeds() {
+async function scanFeeds() {
   const btn = document.querySelector('.scan-btn');
   btn.textContent = 'Scanning...';
   btn.disabled = true;
