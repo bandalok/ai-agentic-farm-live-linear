@@ -678,39 +678,41 @@ function triggerBreaking() {
 
 function showBreakingFromQueue() {
   if (!breakingQueue.length) return;
-  const item = breakingQueue[breakingIndex % breakingQueue.length];
   const container = document.getElementById('breaking-container');
   container.innerHTML = '';
-  const logo = NEWS_LOGOS[item.source];
-  const thumb = BREAKING_THUMBS[Math.floor(Math.random() * BREAKING_THUMBS.length)];
-  const d = document.createElement('div');
-  d.className = 'breaking-popup';
-  const catColor = {Politics:'#1d9bf0',World:'#f4212e',Business:'#ffaa00',Tech:'#a37bff',Sports:'#00ba7c',Entertainment:'#ff6b9d'}[item.category] || '#8b98a8';
-  d.innerHTML = `
-    <div class="bp-header"><span>BREAKING NEWS</span>${breakingQueue.length > 1 ? `<span style="font-size:12px;opacity:0.8;">${(breakingIndex % breakingQueue.length) + 1} of ${breakingQueue.length}</span>` : ''}</div>
-    <div class="bp-body">
-      <img class="bp-thumb" src="${thumb}" alt="">
-      <div class="bp-content">
-        ${item.category ? `<span style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px;background:${catColor}22;color:${catColor};">${escHtml(item.category).toUpperCase()}</span>` : ''}
-        <div class="bp-headline">${escHtml(item.title.replace('BREAKING: ', ''))}</div>
-        <div class="bp-source">
-          ${logo ? `<img class="bp-logo" src="${logo}" alt="${escHtml(item.source)}">` : ''}
-          <span class="bp-channel-name">${escHtml(item.source)}${item.handle ? ' ' + escHtml(item.handle) : ''}</span>
+  // Show up to 3 cards side by side
+  const cards = breakingQueue.slice(0, 3);
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display:flex;gap:12px;justify-content:flex-end;';
+  cards.forEach((item, idx) => {
+    const logo = NEWS_LOGOS[item.source];
+    const thumb = BREAKING_THUMBS[Math.floor(Math.random() * BREAKING_THUMBS.length)];
+    const d = document.createElement('div');
+    d.className = 'breaking-popup';
+    d.style.cssText = 'position:static;width:320px;flex-shrink:0;';
+    const catColor = {Politics:'#1d9bf0',World:'#f4212e',Business:'#ffaa00',Tech:'#a37bff',Sports:'#00ba7c',Entertainment:'#ff6b9d'}[item.category] || '#8b98a8';
+    d.innerHTML = `
+      <div class="bp-header"><span>BREAKING NEWS</span></div>
+      <div class="bp-body">
+        <img class="bp-thumb" src="${thumb}" alt="" style="height:100px;">
+        <div class="bp-content">
+          ${item.category ? `<span style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px;background:${catColor}22;color:${catColor};">${escHtml(item.category).toUpperCase()}</span>` : ''}
+          <div class="bp-headline" style="font-size:14px;">${escHtml(item.title.replace('BREAKING: ', '').substring(0, 100))}${item.title.length > 100 ? '...' : ''}</div>
+          <div class="bp-source">
+            ${logo ? `<img class="bp-logo" src="${logo}" alt="${escHtml(item.source)}">` : ''}
+            <span class="bp-channel-name">${escHtml(item.source)}${item.handle ? ' ' + escHtml(item.handle) : ''}</span>
+          </div>
         </div>
-        ${breakingQueue.length > 1 ? `<div style="display:flex;gap:8px;margin-top:12px;">
-          <button onclick="event.stopPropagation();breakingIndex--;showBreakingFromQueue();" style="flex:1;background:#2a3546;border:none;color:#fff;padding:8px;border-radius:6px;cursor:pointer;">← Prev</button>
-          <button onclick="event.stopPropagation();breakingIndex++;showBreakingFromQueue();" style="flex:1;background:#2a3546;border:none;color:#fff;padding:8px;border-radius:6px;cursor:pointer;">Next →</button>
-        </div>` : ''}
-      </div>
-    </div>`;
-  d.onclick = (e) => {
-    if (e.target.tagName === 'BUTTON') return;
-    d.classList.add('hide');
-    setTimeout(() => container.innerHTML = '', 300);
-  };
-  container.appendChild(d);
+      </div>`;
+    d.onclick = () => {
+      d.style.display = 'none';
+      if ([...wrapper.children].every(c => c.style.display === 'none')) container.innerHTML = '';
+    };
+    wrapper.appendChild(d);
+  });
+  container.appendChild(wrapper);
   setTimeout(() => {
-    if (d.parentNode) { d.classList.add('hide'); setTimeout(() => container.innerHTML = '', 300); }
+    if (wrapper.parentNode) container.innerHTML = '';
   }, 20000);
 }
 
