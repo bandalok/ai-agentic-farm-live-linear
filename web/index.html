@@ -161,7 +161,7 @@
 </head>
 <body>
 <header>
-  <h1><span>EPG</span> Farm</h1>
+  <h1><span>EPG</span> Farm <span id="build-ver" style="font-size:12px;font-weight:600;color:#8b98a8;background:#1a2230;padding:3px 10px;border-radius:12px;vertical-align:middle;"></span></h1>
   <div class="agent-bar">
     <label for="agent">Viewer:</label>
     <select id="agent"></select>
@@ -1205,6 +1205,13 @@ function renderAdmin() {
 }
 
 async function init() {
+  // Set build version
+  try {
+    const vr = await fetch('VERSION');
+    const vv = (await vr.text()).trim();
+    const vel = document.getElementById('build-ver');
+    if (vel) vel.textContent = 'v' + vv;
+  } catch(e) {}
   const [ch, pr, ag, tm, bn, pl, fr] = await Promise.all([
     fetch('data/channels.json').then(r=>r.json()),
     fetch('data/programs.json').then(r=>r.json()),
