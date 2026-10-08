@@ -652,14 +652,65 @@ const NEWS_LOGOS = {
 // Breaking news thumbnails (varied news images)
 const BREAKING_THUMBS = ['img/news.jpg','img/news2.jpg','img/news3.jpg','img/news4.jpg','img/news5.jpg'];
 
+let breakingQueue = [];
+let breakingIndex = 0;
+
 function triggerBreaking() {
+  // First check for editor-approved breaking news from localStorage
+  try {
+    const epgBn = JSON.parse(localStorage.getItem('epg_breaking_news') || 'null');
+    if (epgBn && epgBn.items && epgBn.items.length) {
+      breakingQueue = epgBn.items;
+      breakingIndex = 0;
+      showBreakingFromQueue();
+      return;
+    }
+  } catch(e) {}
+  // Fall back to random scenarios
   if (!BREAKING_NEWS.length) return;
-  // Pick a random scenario and a random news channel
   const scenario = BREAKING_NEWS[Math.floor(Math.random() * BREAKING_NEWS.length)];
   const newsChs = CHANNELS.filter(c => c.genre === 'news');
   const ch = newsChs.length ? newsChs[Math.floor(Math.random() * newsChs.length)] : { name: 'CNN' };
   activeBreaking = { ...scenario, channel: ch.name };
   showBreakingPopup();
+}
+
+function showBreakingFromQueue() {
+  if (!breakingQueue.length) return;
+  const item = breakingQueue[breakingIndex % breakingQueue.length];
+  const container = document.getElementById('breaking-container');
+  container.innerHTML = '';
+  const logo = NEWS_LOGOS[item.source];
+  const thumb = BREAKING_THUMBS[Math.floor(Math.random() * BREAKING_THUMBS.length)];
+  const d = document.createElement('div');
+  d.className = 'breaking-popup';
+  const catColor = {Politics:'#1d9bf0',World:'#f4212e',Business:'#ffaa00',Tech:'#a37bff',Sports:'#00ba7c',Entertainment:'#ff6b9d'}[item.category] || '#8b98a8';
+  d.innerHTML = `
+    <div class="bp-header"><span>BREAKING NEWS</span>${breakingQueue.length > 1 ? `<span style="font-size:12px;opacity:0.8;">${(breakingIndex % breakingQueue.length) + 1} of ${breakingQueue.length}</span>` : ''}</div>
+    <div class="bp-body">
+      <img class="bp-thumb" src="${thumb}" alt="">
+      <div class="bp-content">
+        ${item.category ? `<span style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px;background:${catColor}22;color:${catColor};">${escHtml(item.category).toUpperCase()}</span>` : ''}
+        <div class="bp-headline">${escHtml(item.title.replace('BREAKING: ', ''))}</div>
+        <div class="bp-source">
+          ${logo ? `<img class="bp-logo" src="${logo}" alt="${escHtml(item.source)}">` : ''}
+          <span class="bp-channel-name">${escHtml(item.source)}${item.handle ? ' ' + escHtml(item.handle) : ''}</span>
+        </div>
+        ${breakingQueue.length > 1 ? `<div style="display:flex;gap:8px;margin-top:12px;">
+          <button onclick="event.stopPropagation();breakingIndex--;showBreakingFromQueue();" style="flex:1;background:#2a3546;border:none;color:#fff;padding:8px;border-radius:6px;cursor:pointer;">← Prev</button>
+          <button onclick="event.stopPropagation();breakingIndex++;showBreakingFromQueue();" style="flex:1;background:#2a3546;border:none;color:#fff;padding:8px;border-radius:6px;cursor:pointer;">Next →</button>
+        </div>` : ''}
+      </div>
+    </div>`;
+  d.onclick = (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    d.classList.add('hide');
+    setTimeout(() => container.innerHTML = '', 300);
+  };
+  container.appendChild(d);
+  setTimeout(() => {
+    if (d.parentNode) { d.classList.add('hide'); setTimeout(() => container.innerHTML = '', 300); }
+  }, 20000);
 }
 
 function showBreakingPopup() {
@@ -714,27 +765,12 @@ async function fetchMLB(endpoint) {
 async function loadMLBData() {
   const now = Date.now();
   if (mlbCache.schedule && (now - mlbCache.ts) < 60000) return mlbCache;
-  const today = new Date().toISOString().split('T')[0];
-  const loadBundled = async () => {
-    const bundled = await fetch('data/mlb_live.json').then(r => r.json()).catch(() => null);
-    if (bundled) return { ...bundled, ts: Date.now(), live: false };
-    return { schedules: {}, standings: null, ts: Date.now(), live: false };
-  };
+  // Always use bundled demo data for consistent filled-up display
   try {
-    const [sched, standings] = await Promise.all([
-      fetchMLB(`/schedule?sportId=1&date=${today}&hydrate=team,linescore`),
-      fetchMLB(`/standings?leagueId=103,104&season=2026&standingsTypes=regularSeason`),
-    ]);
-    // Check if API actually returned games; if empty (offseason), use bundled
-    const gameCount = (sched?.dates || []).reduce((n, d) => n + (d.games || []).length, 0);
-    if (gameCount === 0) {
-      console.log('MLB API returned no games, using bundled data');
-      return loadBundled();
-    }
-    mlbCache = { schedules: { [today]: sched }, standings, ts: now, live: true };
+    const bundled = await fetch('data/mlb_live.json').then(r => r.json());
+    mlbCache = { ...bundled, ts: now, live: false };
   } catch(e) {
-    console.log('MLB live API failed, using bundled data');
-    mlbCache = await loadBundled();
+    mlbCache = { schedules: {}, standings: null, ts: now, live: false };
   }
   return mlbCache;
 }
@@ -772,7 +808,8 @@ function renderMLBHub(el, data) {
   const final = games.filter(g => /Final/i.test(g.status.detailedState));
   let demoLive = [];
   if (!live.length && games.length) {
-    const candidate = games.find(g => g.teams?.away?.score !== undefined) || games[0];
+    // Prefer a game with real scores for the demo hero
+    const candidate = games.find(g => (g.teams?.away?.score ?? 0) > 0 || (g.teams?.home?.score ?? 0) > 0) || games[0];
     if (candidate) demoLive = [{ ...candidate, _demoLive: true }];
   }
   const allLive = [...live, ...demoLive];
@@ -784,68 +821,68 @@ function renderMLBHub(el, data) {
   const heroGame = allLive[0];
   const heroHtml = heroGame ? (() => {
     const away = heroGame.teams.away, home = heroGame.teams.home;
-    const ls = heroGame.linescore || {};
-    const curInning = ls.currentInning || 7;
-    const inning = heroGame._demoLive && !ls.currentInning ? '7th \u25b2' :
-      ls.currentInning ? `${ls.currentInning}${ls.inningState === 'Top' ? '\u25b2' : '\u25bc'}` : 'LIVE';
-    // Generate inning-by-inning linescore
     const awayScore = away.score ?? 0, homeScore = home.score ?? 0;
-    const genLine = (total, innings) => {
-      const line = []; let remaining = total;
+    const curInning = 7;
+    // Generate realistic linescore with hits and errors
+    const genLine = (runs, innings) => {
+      const line = []; let rem = runs;
       for (let i = 0; i < innings; i++) {
-        if (i === innings - 1) { line.push(remaining); }
-        else { const r = Math.min(remaining, Math.floor(Math.random() * 3)); line.push(r); remaining -= r; }
+        if (i === innings - 1) { line.push(rem); }
+        else { const r = Math.min(rem, Math.floor(Math.random() * 3)); line.push(r); rem -= r; }
       }
       return line;
     };
     const aLine = genLine(awayScore, curInning);
     const hLine = genLine(homeScore, curInning);
-    const inningHeaders = Array.from({length: curInning}, (_, i) => `<th style="padding:6px 8px;color:#8b98a8;font-size:11px;">${i+1}</th>`).join('');
-    const aCells = aLine.map(r => `<td style="padding:6px 8px;text-align:center;font-size:13px;">${r}</td>`).join('');
-    const hCells = hLine.map(r => `<td style="padding:6px 8px;text-align:center;font-size:13px;">${r}</td>`).join('');
-    // Matchup details
-    const pitchers = ['G. Cole', 'S. Ohtani', 'T. Skubal', 'Z. Wheeler', 'C. Sale', 'P. Skenes'];
-    const batters = ['A. Judge', 'S. Ohtani', 'M. Trout', 'J. Soto', 'B. Harper', 'F. Freeman'];
-    const pitcher = pitchers[Math.floor(Math.random() * pitchers.length)];
-    const batter = batters[Math.floor(Math.random() * batters.length)];
-    const count = `${Math.floor(Math.random()*4)}-${Math.floor(Math.random()*3)}`;
-    const outs = Math.floor(Math.random() * 3);
+    const aHits = awayScore + Math.floor(Math.random() * 5) + 2;
+    const hHits = homeScore + Math.floor(Math.random() * 5) + 2;
+    const aErr = Math.floor(Math.random() * 2);
+    const hErr = Math.floor(Math.random() * 2);
+    const headers = Array.from({length: curInning}, (_, i) => `<td style="padding:8px 6px;text-align:center;color:#8b98a8;font-size:12px;">${i+1}</td>`).join('');
+    const aCells = aLine.map(r => `<td style="padding:8px 6px;text-align:center;font-size:14px;">${r}</td>`).join('');
+    const hCells = hLine.map(r => `<td style="padding:8px 6px;text-align:center;font-size:14px;">${r}</td>`).join('');
     return `
-    <div style="background:linear-gradient(135deg,#0a1628 0%,#1a2b4a 100%);border-radius:16px;padding:28px;margin-bottom:24px;border:1px solid #2a3f5f;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:16px;right:20px;background:#ff4444;color:#fff;font-size:12px;font-weight:800;padding:5px 14px;border-radius:20px;letter-spacing:1px;">\u25cf LIVE</div>
-      <div style="font-size:12px;color:#8b98a8;margin-bottom:16px;letter-spacing:1px;">${inning} &middot; ${liveLabel}</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:32px;">
-        <div style="text-align:center;flex:1;">
-          <img src="${teamLogoUrl(away.team.abbreviation)}" style="width:84px;height:84px;object-fit:contain;" onerror="this.style.display='none'">
-          <div style="font-size:18px;font-weight:800;margin-top:10px;">${away.team.abbreviation}</div>
-          <div style="font-size:13px;color:#8b98a8;">${away.team.name}</div>
-          <div style="font-size:48px;font-weight:900;margin-top:8px;">${away.score ?? 0}</div>
+    <div style="background:#fff;color:#1a1a1a;border-radius:12px;padding:32px;margin-bottom:24px;position:relative;box-shadow:0 4px 24px rgba(0,0,0,0.3);">
+      <div style="position:absolute;top:20px;right:24px;background:#ff4444;color:#fff;font-size:12px;font-weight:800;padding:6px 16px;border-radius:20px;letter-spacing:1px;">● LIVE</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:14px;color:#5c6b7d;">MLB · Today</span>
+        <span style="font-size:14px;font-weight:600;">7th ▲</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:48px;margin:24px 0;">
+        <div style="text-align:center;">
+          <img src="${teamLogoUrl(away.team.abbreviation)}" style="width:72px;height:72px;object-fit:contain;" onerror="this.style.display='none'">
+          <div style="font-size:17px;margin-top:12px;">${away.team.name}</div>
         </div>
-        <div style="font-size:24px;color:#5c6b7d;font-weight:300;">@</div>
-        <div style="text-align:center;flex:1;">
-          <img src="${teamLogoUrl(home.team.abbreviation)}" style="width:84px;height:84px;object-fit:contain;" onerror="this.style.display='none'">
-          <div style="font-size:18px;font-weight:800;margin-top:10px;">${home.team.abbreviation}</div>
-          <div style="font-size:13px;color:#8b98a8;">${home.team.name}</div>
-          <div style="font-size:48px;font-weight:900;margin-top:8px;">${home.score ?? 0}</div>
+        <div style="font-size:56px;font-weight:300;">${awayScore}</div>
+        <div style="font-size:32px;color:#ccc;font-weight:300;">-</div>
+        <div style="font-size:56px;font-weight:300;">${homeScore}</div>
+        <div style="text-align:center;">
+          <img src="${teamLogoUrl(home.team.abbreviation)}" style="width:72px;height:72px;object-fit:contain;" onerror="this.style.display='none'">
+          <div style="font-size:17px;margin-top:12px;">${home.team.name}</div>
         </div>
       </div>
-      <div style="display:flex;gap:24px;margin-top:20px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:280px;">
-          <div style="font-size:11px;color:#8b98a8;letter-spacing:1px;margin-bottom:8px;">LINESCORE</div>
-          <table style="border-collapse:collapse;background:rgba(0,0,0,0.2);border-radius:8px;overflow:hidden;">
-            <tr><th style="padding:6px 8px;"></th>${inningHeaders}<th style="padding:6px 8px;color:#8b98a8;font-size:11px;">R</th></tr>
-            <tr><td style="padding:6px 8px;font-weight:700;font-size:12px;">${away.team.abbreviation}</td>${aCells}<td style="padding:6px 8px;text-align:center;font-weight:800;">${awayScore}</td></tr>
-            <tr><td style="padding:6px 8px;font-weight:700;font-size:12px;">${home.team.abbreviation}</td>${hCells}<td style="padding:6px 8px;text-align:center;font-weight:800;">${homeScore}</td></tr>
-          </table>
-        </div>
-        <div style="flex:1;min-width:200px;">
-          <div style="font-size:11px;color:#8b98a8;letter-spacing:1px;margin-bottom:8px;">AT THE PLATE</div>
-          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:14px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#8b98a8;font-size:13px;">Pitching</span><span style="font-weight:700;">${pitcher}</span></div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#8b98a8;font-size:13px;">Batting</span><span style="font-weight:700;">${batter}</span></div>
-            <div style="display:flex;justify-content:space-between;"><span style="color:#8b98a8;font-size:13px;">Count · Outs</span><span style="font-weight:700;">${count} · ${outs} out</span></div>
-          </div>
-        </div>
+      <div style="text-align:center;font-size:14px;color:#5c6b7d;margin-bottom:20px;">Division Series · Game 3</div>
+      <div style="border-top:1px solid #e0e0e0;padding-top:16px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="padding:8px 6px;font-size:13px;color:#5c6b7d;">Team</td>${headers}
+            <td style="padding:8px 6px;text-align:center;font-size:12px;color:#5c6b7d;font-weight:600;">R</td>
+            <td style="padding:8px 6px;text-align:center;font-size:12px;color:#5c6b7d;font-weight:600;">H</td>
+            <td style="padding:8px 6px;text-align:center;font-size:12px;color:#5c6b7d;font-weight:600;">E</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 6px;font-size:14px;">${away.team.name}</td>${aCells}
+            <td style="padding:8px 6px;text-align:center;font-weight:700;">${awayScore}</td>
+            <td style="padding:8px 6px;text-align:center;">${aHits}</td>
+            <td style="padding:8px 6px;text-align:center;">${aErr}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 6px;font-size:14px;">${home.team.name}</td>${hCells}
+            <td style="padding:8px 6px;text-align:center;font-weight:700;">${homeScore}</td>
+            <td style="padding:8px 6px;text-align:center;">${hHits}</td>
+            <td style="padding:8px 6px;text-align:center;">${hErr}</td>
+          </tr>
+        </table>
       </div>
     </div>`;
   })() : '';
