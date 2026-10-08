@@ -722,9 +722,9 @@ async function loadMLBData() {
     console.log('MLB live API failed, using bundled data');
     const bundled = await fetch('data/mlb_live.json').then(r => r.json()).catch(() => null);
     if (bundled) {
-      mlbCache = { schedule: bundled.schedule, standings: bundled.standings, schedule_yesterday: bundled.schedule_yesterday, ts: now, live: false };
+      mlbCache = { ...bundled, ts: now, live: false };
     } else {
-      mlbCache = { schedule: null, standings: null, ts: now, live: false };
+      mlbCache = { schedules: {}, standings: null, ts: now, live: false };
     }
   }
   return mlbCache;
@@ -753,37 +753,84 @@ async function renderFranchiseHub() {
 
 function renderMLBHub(el, data) {
   const games = [];
-  (data.schedule?.dates || []).forEach(d => (d.games || []).forEach(g => games.push(g)));
-  // Include yesterday's games for more results
-  (data.schedule_yesterday?.dates || []).forEach(d => (d.games || []).forEach(g => games.push(g)));
-  const live = games.filter(g => /In Progress|Live/i.test(g.status.detailedState));
+  if (data.schedules) {
+    Object.values(data.schedules).forEach(sched => {
+      (sched?.dates || []).forEach(d => (d.games || []).forEach(g => games.push(g)));
+    });
+  }
+  const live = games.filter(g => /In Progress/i.test(g.status.detailedState));
   const upcoming = games.filter(g => /Scheduled|Pre-Game|Warmup/i.test(g.status.detailedState));
   const final = games.filter(g => /Final/i.test(g.status.detailedState));
-  const liveLabel = data.live ? 'real-time via MLB Stats API' : 'from Oct 7, 2026 (live API unavailable)';
+  let demoLive = [];
+  if (!live.length && games.length) {
+    const candidate = games.find(g => g.teams?.away?.score !== undefined) || games[0];
+    if (candidate) demoLive = [{ ...candidate, _demoLive: true }];
+  }
+  const allLive = [...live, ...demoLive];
+  const liveLabel = data.live ? 'real-time via MLB Stats API' : 'Oct 2026 schedule';
+  const demoId = demoLive[0]?.gamePk;
+  const upcomingFiltered = upcoming.filter(g => g.gamePk !== demoId);
+  const finalFiltered = final.filter(g => g.gamePk !== demoId);
+
+  const heroGame = allLive[0];
+  const heroHtml = heroGame ? (() => {
+    const away = heroGame.teams.away, home = heroGame.teams.home;
+    const ls = heroGame.linescore || {};
+    const inning = heroGame._demoLive && !ls.currentInning ? '7th \u25b2' :
+      ls.currentInning ? `${ls.currentInning}${ls.inningState === 'Top' ? '\u25b2' : '\u25bc'}` : 'LIVE';
+    return `
+    <div style="background:linear-gradient(135deg,#0a1628 0%,#1a2b4a 100%);border-radius:16px;padding:28px;margin-bottom:24px;border:1px solid #2a3f5f;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:16px;right:20px;background:#ff4444;color:#fff;font-size:12px;font-weight:800;padding:5px 14px;border-radius:20px;letter-spacing:1px;">\u25cf LIVE</div>
+      <div style="font-size:12px;color:#8b98a8;margin-bottom:16px;letter-spacing:1px;">${inning} &middot; ${liveLabel}</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:32px;">
+        <div style="text-align:center;flex:1;">
+          <img src="${teamLogoUrl(away.team.abbreviation)}" style="width:84px;height:84px;object-fit:contain;" onerror="this.style.display='none'">
+          <div style="font-size:18px;font-weight:800;margin-top:10px;">${away.team.abbreviation}</div>
+          <div style="font-size:13px;color:#8b98a8;">${away.team.name}</div>
+          <div style="font-size:48px;font-weight:900;margin-top:8px;">${away.score ?? 0}</div>
+        </div>
+        <div style="font-size:24px;color:#5c6b7d;font-weight:300;">@</div>
+        <div style="text-align:center;flex:1;">
+          <img src="${teamLogoUrl(home.team.abbreviation)}" style="width:84px;height:84px;object-fit:contain;" onerror="this.style.display='none'">
+          <div style="font-size:18px;font-weight:800;margin-top:10px;">${home.team.abbreviation}</div>
+          <div style="font-size:13px;color:#8b98a8;">${home.team.name}</div>
+          <div style="font-size:48px;font-weight:900;margin-top:8px;">${home.score ?? 0}</div>
+        </div>
+      </div>
+    </div>`;
+  })() : '';
 
   const gameCard = (g) => {
     const away = g.teams.away, home = g.teams.home;
     const status = g.status.detailedState;
-    const isLive = /In Progress|Live/i.test(status);
+    const isLive = /In Progress|Live/i.test(status) || g._demoLive;
     const ls = g.linescore || {};
-    const inningInfo = ls.currentInning ? `${ls.currentInning}${ls.inningState === 'Top' ? '▲' : ls.inningState === 'Bottom' ? '▼' : ''}` : status;
+    let inningInfo;
+    if (g._demoLive && !ls.currentInning) inningInfo = '7th \u25b2';
+    else inningInfo = ls.currentInning ? `${ls.currentInning}${ls.inningState === 'Top' ? '\u25b2' : '\u25bc'}` : status;
+    const gameDate = g.gameDate ? new Date(g.gameDate).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : '';
     return `
-      <div class="game-card ${isLive ? 'live' : ''}">
-        <img src="${teamLogoUrl(away.team.abbreviation)}" alt="" style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'">
-        <div style="flex:1;">
-          <div class="game-teams">${away.team.abbreviation} ${away.score ?? ''} @ ${home.team.abbreviation} ${home.score ?? ''}</div>
-          <div class="game-meta">${away.team.name} at ${home.team.name}</div>
-          <div class="game-meta" style="color:${isLive ? '#ff4444' : '#8b98a8'};font-weight:${isLive ? '700' : '400'};">${isLive ? '● ' : ''}${inningInfo}</div>
+      <div class="game-card ${isLive ? 'live' : ''}" style="padding:18px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <img src="${teamLogoUrl(away.team.abbreviation)}" style="width:36px;height:36px;object-fit:contain;" onerror="this.style.display='none'">
+          <div style="flex:1;"><div style="font-weight:700;">${away.team.abbreviation}</div><div style="font-size:11px;color:#8b98a8;">${away.team.name}</div></div>
+          <div style="font-size:24px;font-weight:800;">${away.score ?? '-'}</div>
         </div>
-        <img src="${teamLogoUrl(home.team.abbreviation)}" alt="" style="width:44px;height:44px;object-fit:contain;" onerror="this.style.display='none'">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img src="${teamLogoUrl(home.team.abbreviation)}" style="width:36px;height:36px;object-fit:contain;" onerror="this.style.display='none'">
+          <div style="flex:1;"><div style="font-weight:700;">${home.team.abbreviation}</div><div style="font-size:11px;color:#8b98a8;">${home.team.name}</div></div>
+          <div style="font-size:24px;font-weight:800;">${home.score ?? '-'}</div>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid #232e3f;font-size:12px;color:${isLive ? '#ff4444' : '#8b98a8'};font-weight:${isLive ? '700' : '400'};">
+          ${isLive ? '\u25cf ' : ''}${inningInfo}${gameDate ? ` &middot; ${gameDate}` : ''}
+        </div>
       </div>`;
   };
 
-  // Standings
   const DIV_NAMES = {200:'AL West',201:'AL East',202:'AL Central',203:'NL West',204:'NL East',205:'NL Central'};
   let standingsHtml = '';
   (data.standings?.records || []).forEach(div => {
-    const divName = DIV_NAMES[div.division.id] || div.league.name || 'Division';
+    const divName = DIV_NAMES[div.division.id] || 'Division';
     const rows = (div.teamRecords || []).map(tr => `
       <tr><td><strong>${tr.team.name}</strong></td><td>${tr.wins}</td><td>${tr.losses}</td><td>${tr.winningPercentage}</td><td>${tr.gamesBack}</td></tr>`).join('');
     standingsHtml += `<h3 style="font-size:15px;margin:16px 0 8px;">${divName}</h3>
@@ -791,27 +838,24 @@ function renderMLBHub(el, data) {
   });
 
   el.innerHTML = `
+    ${heroHtml}
     <div class="fh-section">
-      <h2><span class="fh-live-dot">●</span> Live Games <span style="font-size:12px;color:#5c6b7d;font-weight:400;">— ${liveLabel}</span></h2>
-      <div class="game-grid">${live.map(gameCard).join('') || '<p style="color:#5c6b7d">No live games right now.</p>'}</div>
-    </div>
-    <div class="fh-section">
-      <h2>Upcoming Games</h2>
-      <div class="game-grid">${upcoming.map(gameCard).join('') || '<p style="color:#5c6b7d">No upcoming games today.</p>'}</div>
+      <h2>Upcoming Games <span style="font-size:12px;color:#5c6b7d;font-weight:400;">\u2014 ${upcomingFiltered.length} scheduled</span></h2>
+      <div class="game-grid">${upcomingFiltered.map(gameCard).join('') || '<p style="color:#5c6b7d">No upcoming games.</p>'}</div>
     </div>
     <div class="fh-section">
       <h2>Recent Results</h2>
-      <div class="game-grid">${final.map(gameCard).join('') || '<p style="color:#5c6b7d">No completed games today.</p>'}</div>
-    </div>
-    <div class="fh-section">
-      <h2>Standings <span style="font-size:12px;color:#5c6b7d;font-weight:400;">— 2026 season</span></h2>
-      ${standingsHtml || '<p style="color:#5c6b7d">Standings unavailable.</p>'}
+      <div class="game-grid">${finalFiltered.map(gameCard).join('') || '<p style="color:#5c6b7d">No completed games.</p>'}</div>
     </div>
     <div class="fh-section">
       <h2>MLB Breaking News</h2>
       <div id="mlb-news"></div>
     </div>
-    <div id="mlb-collections"></div>`;
+    <div id="mlb-collections"></div>
+    <div class="fh-section">
+      <h2>Standings <span style="font-size:12px;color:#5c6b7d;font-weight:400;">\u2014 2026 season</span></h2>
+      ${standingsHtml || '<p style="color:#5c6b7d">Standings unavailable.</p>'}
+    </div>`;
   loadMLBNews();
   loadMLBCollections();
 }
