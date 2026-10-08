@@ -61,6 +61,7 @@
   .cat-business { background: #ffaa0022; color: #ffaa00; }
   .cat-world { background: #f4212e22; color: #f4212e; }
   .cat-entertainment { background: #ff6b9d22; color: #ff6b9d; }
+  .cat-alok { background: #1d9bf022; color: #1d9bf0; }
 </style>
 </head>
 <body>
@@ -79,7 +80,19 @@
   <div class="feed">
     <div class="feed-header">
       <span>Breaking News Wire</span>
-      <button class="scan-btn" onclick="scanFeeds()">↻ Scan</button>
+      <div style="display:flex;gap:8px;">
+        <button class="scan-btn" onclick="showAddTweet()" style="background:#1d9bf0;">+ Add Tweet</button>
+        <button class="scan-btn" onclick="scanFeeds()">↻ Scan</button>
+      </div>
+    </div>
+    <div id="add-tweet-box" style="display:none;padding:16px 20px;border-bottom:1px solid #2f3336;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px;">Add your tweet as breaking news</div>
+      <input id="tweet-url" placeholder="Paste tweet URL (x.com/techprosv/status/...)" style="width:100%;background:#16181c;border:1px solid #2f3336;color:#fff;border-radius:8px;padding:10px;margin-bottom:8px;font-size:14px;">
+      <input id="tweet-text" placeholder="Or type/paste the tweet text directly" style="width:100%;background:#16181c;border:1px solid #2f3336;color:#fff;border-radius:8px;padding:10px;margin-bottom:8px;font-size:14px;">
+      <div style="display:flex;gap:8px;">
+        <button class="scan-btn" onclick="addTweet()">Add to Feed</button>
+        <button class="btn btn-reject" onclick="document.getElementById('add-tweet-box').style.display='none'">Cancel</button>
+      </div>
     </div>
     <div class="cat-tabs" id="cat-tabs"></div>
     <div id="tweets"></div>
@@ -100,12 +113,12 @@
 const SOURCE_COLORS = {
   'CNN': '#cc0000', 'BBC': '#bb1919', 'Fox News': '#003366',
   'Reuters': '#ff8000', 'AP': '#000000', 'MSNBC': '#0066cc',
-  'NYT': '#333333', 'NBC': '#0066ff', 'ABC': '#000099', 'CBS': '#003399', 'ESPN': '#cc0000'
+  'NYT': '#333333', 'NBC': '#0066ff', 'ABC': '#000099', 'CBS': '#003399', 'ESPN': '#cc0000', 'NPR': '#237bbd', 'Guardian': '#052962', 'Al Jazeera': '#fa9000', 'TechCrunch': '#0a0', 'Politico': '#dc143c', 'Alok': '#1d9bf0'
 };
 const SOURCE_HANDLES = {
   'CNN': '@CNN', 'BBC': '@BBCBreaking', 'Fox News': '@FoxNews',
   'Reuters': '@Reuters', 'AP': '@AP', 'MSNBC': '@MSNBC',
-  'NYT': '@nytimes', 'NBC': '@NBCNews', 'ABC': '@ABC', 'CBS': '@CBSNews', 'ESPN': '@espn'
+  'NYT': '@nytimes', 'NBC': '@NBCNews', 'ABC': '@ABC', 'CBS': '@CBSNews', 'ESPN': '@espn', 'NPR': '@NPR', 'Guardian': '@guardian', 'Al Jazeera': '@AJEnglish', 'TechCrunch': '@TechCrunch', 'Politico': '@politico', 'Alok': '@techprosv'
 };
 
 let tweets = [];
@@ -126,7 +139,7 @@ function save() {
   localStorage.setItem('ed_history', JSON.stringify(pushHistory));
 }
 
-const CATEGORIES = ['All', 'Politics', 'World', 'Business', 'Tech', 'Sports', 'Entertainment'];
+const CATEGORIES = ['All', 'Politics', 'World', 'Business', 'Tech', 'Sports', 'Entertainment', 'Alok'];
 let activeCategory = 'All';
 
 function seedTweets() {
@@ -172,6 +185,13 @@ const RSS_FEEDS = [
   {source: 'CNN', url: 'http://rss.cnn.com/rss/cnn_topstories.rss', cat: 'World'},
   {source: 'BBC', url: 'http://feeds.bbci.co.uk/news/rss.xml', cat: 'World'},
   {source: 'ESPN', url: 'https://www.espn.com/espn/rss/news', cat: 'Sports'},
+  {source: 'NPR', url: 'https://feeds.npr.org/1001/rss.xml', cat: 'World'},
+  {source: 'CBS', url: 'https://www.cbsnews.com/latest/rss/main', cat: 'World'},
+  {source: 'NBC', url: 'https://feeds.nbcnews.com/nbcnews/public/news', cat: 'World'},
+  {source: 'Guardian', url: 'https://www.theguardian.com/world/rss', cat: 'World'},
+  {source: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml', cat: 'World'},
+  {source: 'TechCrunch', url: 'https://techcrunch.com/feed/', cat: 'Tech'},
+  {source: 'Politico', url: 'https://www.politico.com/rss/politicopicks.xml', cat: 'Politics'},
 ];
 
 const CAT_KEYWORDS = {
@@ -190,25 +210,89 @@ function detectCategory(text) {
   return 'World';
 }
 
-async function scanFeeds() {
+async function showAddTweet() {
+  document.getElementById('add-tweet-box').style.display = 'block';
+}
+
+async function addTweet() {
+  const url = document.getElementById('tweet-url').value.trim();
+  const text = document.getElementById('tweet-text').value.trim();
+  let tweetText = text;
+
+  // Try to fetch tweet content via oEmbed if URL provided
+  if (url && !text) {
+    try {
+      const oembed = await fetch('https://publish.twitter.com/oembed?url=' + encodeURIComponent(url));
+      if (oembed.ok) {
+        const data = await oembed.json();
+        // Extract text from HTML
+        const div = document.createElement('div');
+        div.innerHTML = data.html;
+        tweetText = div.textContent || div.innerText || '';
+        // Clean up
+        tweetText = tweetText.replace(/—.*$/, '').trim();
+      }
+    } catch(e) { console.log('oEmbed failed'); }
+  }
+
+  if (!tweetText) { alert('Enter tweet text or a valid tweet URL'); return; }
+
+  tweets.unshift({
+    id: 'alok-' + Date.now(),
+    source: 'Alok',
+    handle: '@techprosv',
+    text: tweetText,
+    time: 'now',
+    breaking: true,
+    category: 'Alok',
+    status: 'pending'
+  });
+  document.getElementById('tweet-url').value = '';
+  document.getElementById('tweet-text').value = '';
+  document.getElementById('add-tweet-box').style.display = 'none';
+  save(); render();
+}
+
+function scanFeeds() {
   const btn = document.querySelector('.scan-btn');
   btn.textContent = 'Scanning...';
   btn.disabled = true;
   let newCount = 0;
   const existingTitles = new Set(tweets.map(t => t.text));
 
-  for (const feed of RSS_FEEDS) {
+  const fetchWithTimeout = async (url, ms = 10000) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), ms);
     try {
-      // Use CORS proxy to fetch RSS
-      const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feed.url);
-      const resp = await fetch(proxyUrl);
-      if (!resp.ok) continue;
-      const xmlText = await resp.text();
+      const r = await fetch(url, {signal: ctrl.signal});
+      clearTimeout(timer);
+      return r;
+    } catch(e) {
+      clearTimeout(timer);
+      throw e;
+    }
+  };
+
+  const PROXIES = [
+    (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+    (u) => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
+  ];
+
+  for (const feed of RSS_FEEDS) {
+    let xmlText = null;
+    for (const proxy of PROXIES) {
+      try {
+        const resp = await fetchWithTimeout(proxy(feed.url), 8000);
+        if (resp.ok) { xmlText = await resp.text(); break; }
+      } catch(e) { console.log('Proxy failed for', feed.source); }
+    }
+    if (!xmlText) continue;
+    try {
       const parser = new DOMParser();
       const xml = parser.parseFromString(xmlText, 'text/xml');
       const items = xml.querySelectorAll('item');
       let added = 0;
-      for (let i = 0; i < Math.min(items.length, 8) && added < 5; i++) {
+      for (let i = 0; i < Math.min(items.length, 8) && added < 4; i++) {
         const item = items[i];
         const title = item.querySelector('title')?.textContent?.trim();
         if (!title || existingTitles.has(title) || title.length < 20) continue;
