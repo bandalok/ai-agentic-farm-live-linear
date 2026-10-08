@@ -5,35 +5,35 @@
    "desc": "Flagship sports network",
    "number": 200,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "ESPN2",
    "desc": "Sports news and events",
    "number": 201,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/news.jpg"
   },
   {
    "name": "ESPNU",
    "desc": "College sports",
    "number": 202,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "ESPNews",
    "desc": "24/7 sports news",
    "number": 203,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/news.jpg"
   },
   {
    "name": "ESPN Deportes",
    "desc": "Spanish-language sports",
    "number": 204,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "SEC Network",
@@ -47,42 +47,42 @@
    "desc": "Atlantic Coast Conference",
    "number": 206,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "Longhorn Network",
    "desc": "Texas Longhorns",
    "number": 207,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN Classic",
    "desc": "Classic sports moments",
    "number": 208,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   },
   {
    "name": "ESPN 8: The Ocho",
    "desc": "Obscure sports",
    "number": 209,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "ESPN Films",
    "desc": "Sports documentaries",
    "number": 210,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "ESPN FC",
    "desc": "Soccer coverage",
    "number": 211,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   },
   {
    "name": "ESPN Outdoors",
@@ -96,56 +96,56 @@
    "desc": "International cricket",
    "number": 213,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN Tennis",
    "desc": "Tennis tournaments",
    "number": 214,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "ESPN Golf",
    "desc": "Golf tournaments",
    "number": 215,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/golf.jpg"
   },
   {
    "name": "ESPN Racing",
    "desc": "Motorsports",
    "number": 216,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   },
   {
    "name": "ESPN Olympics",
    "desc": "Olympic sports",
    "number": 217,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   },
   {
    "name": "ESPN X Games",
    "desc": "Extreme sports",
    "number": 218,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "ESPN Fantasy",
    "desc": "Fantasy sports shows",
    "number": 219,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN Betting",
    "desc": "Sports betting analysis",
    "number": 220,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN Radio TV",
@@ -166,21 +166,21 @@
    "desc": "College basketball",
    "number": 223,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN MLB",
    "desc": "Baseball coverage",
    "number": 224,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "ESPN NBA",
    "desc": "Basketball coverage",
    "number": 225,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN NFL",
@@ -194,91 +194,91 @@
    "desc": "Hockey coverage",
    "number": 227,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   },
   {
    "name": "ESPN Soccer",
    "desc": "Global soccer",
    "number": 228,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   },
   {
    "name": "ESPN Women",
    "desc": "Women's sports",
    "number": 229,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN High School",
    "desc": "Prep sports",
    "number": 230,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN Esports",
    "desc": "Competitive gaming",
    "number": 231,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "ESPN WWE",
    "desc": "Wrestling entertainment",
    "number": 232,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/fight.jpg"
   },
   {
    "name": "ESPN Boxing",
    "desc": "Boxing and MMA",
    "number": 233,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/fight.jpg"
   },
   {
    "name": "ESPN Track",
    "desc": "Track and field",
    "number": 234,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   },
   {
    "name": "ESPN Swimming",
    "desc": "Aquatic sports",
    "number": 235,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   },
   {
    "name": "ESPN Gymnastics",
    "desc": "Gymnastics",
    "number": 236,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "ESPN Volleyball",
    "desc": "Volleyball",
    "number": 237,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/basketball.jpg"
   },
   {
    "name": "ESPN Lacrosse",
    "desc": "Lacrosse",
    "number": 238,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/baseball1.jpg"
   },
   {
    "name": "ESPN Rugby",
    "desc": "Rugby union/league",
    "number": 239,
    "provider": "ESPN",
-   "image": "img/football.jpg"
+   "image": "img/international.jpg"
   }
  ],
  "Plex": [
@@ -287,63 +287,63 @@
    "desc": "Free movies 24/7",
    "number": 300,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex TV Classics",
    "desc": "Classic television",
    "number": 301,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Action",
    "desc": "Action movies",
    "number": 302,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Comedy",
    "desc": "Comedy movies and shows",
    "number": 303,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Drama",
    "desc": "Drama series",
    "number": 304,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/music.jpg"
   },
   {
    "name": "Plex Horror",
    "desc": "Horror movies",
    "number": 305,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Sci-Fi",
    "desc": "Science fiction",
    "number": 306,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Plex Documentaries",
    "desc": "Doc films",
    "number": 307,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex News",
    "desc": "News headlines",
    "number": 308,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/news.jpg"
   },
   {
    "name": "Plex Sports",
@@ -357,7 +357,7 @@
    "desc": "Children's programming",
    "number": 310,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/kids.jpg"
   },
   {
    "name": "Plex Anime",
@@ -378,105 +378,105 @@
    "desc": "True crime",
    "number": 313,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Westerns",
    "desc": "Western movies",
    "number": 314,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Romance",
    "desc": "Romantic films",
    "number": 315,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Thriller",
    "desc": "Thrillers",
    "number": 316,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Family",
    "desc": "Family movies",
    "number": 317,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex British",
    "desc": "UK television",
    "number": 318,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex K-Drama",
    "desc": "Korean dramas",
    "number": 319,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Bollywood",
    "desc": "Indian cinema",
    "number": 320,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Nollywood",
    "desc": "Nigerian films",
    "number": 321,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Latino",
    "desc": "Spanish content",
    "number": 322,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Plex French",
    "desc": "French cinema",
    "number": 323,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex German",
    "desc": "German TV",
    "number": 324,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/music.jpg"
   },
   {
    "name": "Plex Japanese",
    "desc": "Japanese shows",
    "number": 325,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/music.jpg"
   },
   {
    "name": "Plex Chinese",
    "desc": "Chinese dramas",
    "number": 326,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Retro",
    "desc": "Retro TV",
    "number": 327,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/music.jpg"
   },
   {
    "name": "Plex Game Shows",
@@ -497,49 +497,49 @@
    "desc": "Food programming",
    "number": 330,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "Plex Travel",
    "desc": "Travel shows",
    "number": 331,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "Plex Nature",
    "desc": "Nature docs",
    "number": 332,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Plex History",
    "desc": "History programming",
    "number": 333,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Plex Science",
    "desc": "Science shows",
    "number": 334,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Plex Tech",
    "desc": "Technology news",
    "number": 335,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/news.jpg"
   },
   {
    "name": "Plex Music",
    "desc": "Music videos",
    "number": 336,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/music.jpg"
   },
   {
    "name": "Plex Fitness",
@@ -553,14 +553,14 @@
    "desc": "Home improvement",
    "number": 338,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Plex Pets",
    "desc": "Animal shows",
    "number": 339,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Plex Gaming",
@@ -581,21 +581,21 @@
    "desc": "Wrestling",
    "number": 342,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/fight.jpg"
   },
   {
    "name": "Plex Boxing",
    "desc": "Boxing matches",
    "number": 343,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/fight.jpg"
   },
   {
    "name": "Plex MMA",
    "desc": "MMA fights",
    "number": 344,
    "provider": "Plex",
-   "image": "img/entertainment.jpg"
+   "image": "img/fight.jpg"
   }
  ],
  "Disney+": [
@@ -625,35 +625,35 @@
    "desc": "Pixar films and shorts",
    "number": 403,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Marvel",
    "desc": "MCU movies and series",
    "number": 404,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Star Wars",
    "desc": "Galaxy far away",
    "number": 405,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "National Geographic",
    "desc": "Nature and science",
    "number": 406,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Nat Geo Wild",
    "desc": "Wildlife",
    "number": 407,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "ESPN on Disney+",
@@ -667,7 +667,7 @@
    "desc": "Princess movies",
    "number": 409,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Disney Villains",
@@ -695,28 +695,28 @@
    "desc": "Live-action films",
    "number": 413,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Disney Musicals",
    "desc": "Musical films",
    "number": 414,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Disney Documentaries",
    "desc": "Behind the magic",
    "number": 415,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Marvel Studios",
    "desc": "MCU deep dives",
    "number": 416,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Marvel Animation",
@@ -730,35 +730,35 @@
    "desc": "Mutant saga",
    "number": 418,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Avengers",
    "desc": "Earth's mightiest",
    "number": 419,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Spider-Man",
    "desc": "Web-slinger",
    "number": 420,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Star Wars Films",
    "desc": "Saga movies",
    "number": 421,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "The Mandalorian",
    "desc": "Mando-verse",
    "number": 422,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Star Wars Animation",
@@ -772,7 +772,7 @@
    "desc": "Adventure films",
    "number": 424,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Pirates Caribbean",
@@ -807,7 +807,7 @@
    "desc": "Ocean adventures",
    "number": 429,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Encanto",
@@ -828,7 +828,7 @@
    "desc": "Springfield",
    "number": 432,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Family Guy",
@@ -849,14 +849,14 @@
    "desc": "Pandora",
    "number": 435,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Alien",
    "desc": "Xenomorph",
    "number": 436,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Predator",
@@ -870,7 +870,7 @@
    "desc": "Ape saga",
    "number": 438,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Die Hard",
@@ -884,21 +884,21 @@
    "desc": "Holiday films",
    "number": 440,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "The Sound of Music",
    "desc": "Classic musicals",
    "number": 441,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/music.jpg"
   },
   {
    "name": "Mary Poppins",
    "desc": "Practically perfect",
    "number": 442,
    "provider": "Disney+",
-   "image": "img/kids.jpg"
+   "image": "img/movies.jpg"
   },
   {
    "name": "Bedknobs",
@@ -921,7 +921,7 @@
    "desc": "Superhero satire",
    "number": 501,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Reacher",
@@ -935,7 +935,7 @@
    "desc": "Wasteland saga",
    "number": 503,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Rings of Power",
@@ -949,7 +949,7 @@
    "desc": "Comedy drama",
    "number": 505,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Jack Ryan",
@@ -970,14 +970,14 @@
    "desc": "Sci-fi epic",
    "number": 508,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Invincible",
    "desc": "Animated superhero",
    "number": 509,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "The Terminal List",
@@ -1005,21 +1005,21 @@
    "desc": "Young supes",
    "number": 513,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Upload",
    "desc": "Digital afterlife",
    "number": 514,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Good Omens",
    "desc": "Fantasy comedy",
    "number": 515,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "The Peripheral",
@@ -1040,14 +1040,14 @@
    "desc": "Time travel",
    "number": 518,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "The Legend of Vox",
    "desc": "Fantasy animation",
    "number": 519,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/kids.jpg"
   },
   {
    "name": "Prime Movies",
@@ -1096,7 +1096,7 @@
    "desc": "Documentaries",
    "number": 526,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Prime Sports",
@@ -1110,35 +1110,35 @@
    "desc": "NFL games",
    "number": 528,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/football.jpg"
   },
   {
    "name": "Prime News",
    "desc": "News programming",
    "number": 529,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/news.jpg"
   },
   {
    "name": "Prime Kids",
    "desc": "Children's shows",
    "number": 530,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/kids.jpg"
   },
   {
    "name": "Prime Anime",
    "desc": "Anime collection",
    "number": 531,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Prime British",
    "desc": "UK imports",
    "number": 532,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Prime Bollywood",
@@ -1152,7 +1152,7 @@
    "desc": "Spanish content",
    "number": 534,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/documentary.jpg"
   },
   {
    "name": "Prime French",
@@ -1173,7 +1173,7 @@
    "desc": "Japanese content",
    "number": 537,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Prime Korean",
@@ -1194,7 +1194,7 @@
    "desc": "MGM library",
    "number": 540,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "James Bond",
@@ -1208,21 +1208,21 @@
    "desc": "Boxing saga",
    "number": 542,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/fight.jpg"
   },
   {
    "name": "Stargate",
    "desc": "Sci-fi franchise",
    "number": 543,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Vikings",
    "desc": "Norse saga",
    "number": 544,
    "provider": "Prime Video",
-   "image": "img/movies.jpg"
+   "image": "img/entertainment.jpg"
   }
  ],
  "ANoki": [
@@ -1231,7 +1231,7 @@
    "desc": "AI industry news",
    "number": 600,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/news.jpg"
   },
   {
    "name": "Anoki Tech",
@@ -1252,7 +1252,7 @@
    "desc": "VC and funding",
    "number": 603,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "Anoki Coding",
@@ -1266,7 +1266,7 @@
    "desc": "Robotics news",
    "number": 605,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/news.jpg"
   },
   {
    "name": "Anoki Space",
@@ -1308,21 +1308,21 @@
    "desc": "Game industry",
    "number": 611,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Anoki Esports",
    "desc": "Competitive gaming",
    "number": 612,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Anoki Creators",
    "desc": "Creator economy",
    "number": 613,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Anoki Design",
@@ -1343,14 +1343,14 @@
    "desc": "Cloud computing",
    "number": 616,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Anoki Cybersecurity",
    "desc": "Security news",
    "number": 617,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/news.jpg"
   },
   {
    "name": "Anoki Mobile",
@@ -1385,21 +1385,21 @@
    "desc": "Energy innovation",
    "number": 622,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "Anoki Transport",
    "desc": "Future of transport",
    "number": 623,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "Anoki Smart Home",
    "desc": "IoT and home",
    "number": 624,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "Anoki Wearables",
@@ -1413,7 +1413,7 @@
    "desc": "Drone industry",
    "number": 626,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Anoki 5G",
@@ -1427,7 +1427,7 @@
    "desc": "Quantum computing",
    "number": 628,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/lifestyle.jpg"
   },
   {
    "name": "Anoki Semiconductors",
@@ -1448,21 +1448,21 @@
    "desc": "Dev practices",
    "number": 631,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Anoki UX",
    "desc": "User experience",
    "number": 632,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Anoki Product",
    "desc": "Product management",
    "number": 633,
    "provider": "ANoki",
-   "image": "img/documentary.jpg"
+   "image": "img/entertainment.jpg"
   },
   {
    "name": "Anoki Marketing",
