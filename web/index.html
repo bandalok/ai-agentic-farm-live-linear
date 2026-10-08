@@ -304,7 +304,7 @@ function buildDaySchedule(ch, dateStr) {
   // Prefer exact subgenre match (Golf Channel gets golf only); fall back to genre
   let pool = PROGRAMS.filter(p => p.genre === ch.genre && p.subgenre === ch.subgenre);
   if (!pool.length) pool = PROGRAMS.filter(p => p.genre === ch.genre);
-  if (!pool.length) return [];
+  if (!pool.length) pool = PROGRAMS; // safety net: never return empty
   const r = rng(hashStr(ch.id + dateStr));
   const slots = [];
   let t = 0; // minutes from midnight
@@ -442,13 +442,20 @@ function renderEPG(gridId, channelList) {
   const grid = document.getElementById(gridId);
   const now = nowMins(), date = todayStr();
   const startMin = Math.max(0, Math.floor(now/60)-1)*60, hours = 6, totalMin = hours*60;
+  // Build tomorrow's date string for midnight crossover
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().slice(0, 10);
   // header
   let html = `<div class="epg-timeline"><div class="epg-time-header"><div class="corner"></div>`;
   for (let h=0; h<hours; h++) html += `<div class="th">${fmtTime(startMin+h*60)}</div>`;
   html += `</div>`;
   // rows
   for (const ch of channelList) {
-    const sched = buildDaySchedule(ch, date).filter(s => s.end > startMin && s.start < startMin+totalMin);
+    // Merge today's and tomorrow's schedules for midnight crossover
+    const todaySched = buildDaySchedule(ch, date);
+    const tomorrowSched = buildDaySchedule(ch, tomorrowStr).map(s => ({...s, start: s.start + 1440, end: s.end + 1440}));
+    const sched = [...todaySched, ...tomorrowSched].filter(s => s.end > startMin && s.start < startMin+totalMin);
     html += `<div class="epg-row"><div class="epg-ch"><div class="num">${ch.number}</div><div class="name">${ch.name}</div></div><div class="epg-track">`;
     for (const s of sched) {
       const isLive = s.start <= now && s.end > now;
