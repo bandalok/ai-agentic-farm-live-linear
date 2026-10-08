@@ -449,6 +449,98 @@
      "img": "img/baseball3.jpg"
     }
    ]
-  }
+  },
+  "upcoming_games": [
+   {
+    "away": "St. Louis Cardinals",
+    "away_abbr": "STL",
+    "home": "New York Yankees",
+    "home_abbr": "NYY",
+    "date": "Today",
+    "time": "1:05 PM",
+    "img": "img/baseball1.jpg"
+   },
+   {
+    "away": "St. Louis Cardinals",
+    "away_abbr": "STL",
+    "home": "LA Dodgers",
+    "home_abbr": "LAD",
+    "date": "Tomorrow",
+    "time": "4:10 PM",
+    "img": "img/baseball2.jpg"
+   },
+   {
+    "away": "San Francisco Giants",
+    "away_abbr": "SFG",
+    "home": "New York Mets",
+    "home_abbr": "NYM",
+    "date": "Sat Oct 10",
+    "time": "6:40 PM",
+    "img": "img/baseball3.jpg"
+   },
+   {
+    "away": "Houston Astros",
+    "away_abbr": "HOU",
+    "home": "New York Mets",
+    "home_abbr": "NYM",
+    "date": "Sun Oct 11",
+    "time": "7:15 PM",
+    "img": "img/baseball4.jpg"
+   },
+   {
+    "away": "Houston Astros",
+    "away_abbr": "HOU",
+    "home": "New York Mets",
+    "home_abbr": "NYM",
+    "date": "Mon Oct 12",
+    "time": "8:05 PM",
+    "img": "img/baseball5.jpg"
+   },
+   {
+    "away": "Chicago Cubs",
+    "away_abbr": "CHC",
+    "home": "Atlanta Braves",
+    "home_abbr": "ATL",
+    "date": "Today",
+    "time": "1:05 PM",
+    "img": "img/baseball6.jpg"
+   },
+   {
+    "away": "Houston Astros",
+    "away_abbr": "HOU",
+    "home": "Atlanta Braves",
+    "home_abbr": "ATL",
+    "date": "Tomorrow",
+    "time": "4:10 PM",
+    "img": "img/baseball1.jpg"
+   },
+   {
+    "away": "Houston Astros",
+    "away_abbr": "HOU",
+    "home": "Philadelphia Phillies",
+    "home_abbr": "PHI",
+    "date": "Sat Oct 10",
+    "time": "6:40 PM",
+    "img": "img/baseball2.jpg"
+   },
+   {
+    "away": "Atlanta Braves",
+    "away_abbr": "ATL",
+    "home": "Chicago Cubs",
+    "home_abbr": "CHC",
+    "date": "Sun Oct 11",
+    "time": "7:15 PM",
+    "img": "img/baseball3.jpg"
+   },
+   {
+    "away": "Houston Astros",
+    "away_abbr": "HOU",
+    "home": "New York Mets",
+    "home_abbr": "NYM",
+    "date": "Mon Oct 12",
+    "time": "8:05 PM",
+    "img": "img/baseball4.jpg"
+   }
+  ]
  }
 }
