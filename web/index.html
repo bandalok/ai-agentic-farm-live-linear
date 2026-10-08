@@ -709,23 +709,28 @@ async function fetchMLB(endpoint) {
 
 async function loadMLBData() {
   const now = Date.now();
-  if (mlbCache.schedule && (now - mlbCache.ts) < 60000) return mlbCache; // 1-min cache
+  if (mlbCache.schedule && (now - mlbCache.ts) < 60000) return mlbCache;
   const today = new Date().toISOString().split('T')[0];
+  const loadBundled = async () => {
+    const bundled = await fetch('data/mlb_live.json').then(r => r.json()).catch(() => null);
+    if (bundled) return { ...bundled, ts: Date.now(), live: false };
+    return { schedules: {}, standings: null, ts: Date.now(), live: false };
+  };
   try {
     const [sched, standings] = await Promise.all([
       fetchMLB(`/schedule?sportId=1&date=${today}&hydrate=team,linescore`),
       fetchMLB(`/standings?leagueId=103,104&season=2026&standingsTypes=regularSeason`),
     ]);
-    mlbCache = { schedule: sched, standings, ts: now, live: true };
-  } catch(e) {
-    // Fall back to bundled real data
-    console.log('MLB live API failed, using bundled data');
-    const bundled = await fetch('data/mlb_live.json').then(r => r.json()).catch(() => null);
-    if (bundled) {
-      mlbCache = { ...bundled, ts: now, live: false };
-    } else {
-      mlbCache = { schedules: {}, standings: null, ts: now, live: false };
+    // Check if API actually returned games; if empty (offseason), use bundled
+    const gameCount = (sched?.dates || []).reduce((n, d) => n + (d.games || []).length, 0);
+    if (gameCount === 0) {
+      console.log('MLB API returned no games, using bundled data');
+      return loadBundled();
     }
+    mlbCache = { schedules: { [today]: sched }, standings, ts: now, live: true };
+  } catch(e) {
+    console.log('MLB live API failed, using bundled data');
+    mlbCache = await loadBundled();
   }
   return mlbCache;
 }
