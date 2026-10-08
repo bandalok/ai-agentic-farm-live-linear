@@ -656,6 +656,16 @@ const BREAKING_THUMBS = ['img/news.jpg','img/news2.jpg','img/news3.jpg','img/new
 let breakingQueue = [];
 let breakingIndex = 0;
 
+// Map news sources to EPG channel numbers
+const SOURCE_CHANNEL_MAP = {
+  'CNN': 201, 'Fox News': 202, 'MSNBC': 203, 'BBC': 204,
+  'CNBC': 205, 'Bloomberg': 206, 'Newsmax': 207,
+  'Al Jazeera': 212, 'NPR': 201, 'Guardian': 204,
+  'Reuters': 205, 'AP': 201, 'NYT': 203, 'NBC': 203,
+  'CBS': 203, 'ABC': 203, 'Politico': 203, 'ESPN': 101,
+  'TechCrunch': 205,
+};
+
 function triggerBreaking() {
   // First check for editor-approved breaking news from localStorage
   try {
@@ -674,6 +684,31 @@ function triggerBreaking() {
   const ch = newsChs.length ? newsChs[Math.floor(Math.random() * newsChs.length)] : { name: 'CNN' };
   activeBreaking = { ...scenario, channel: ch.name };
   showBreakingPopup();
+}
+
+function watchBreakingChannel(source) {
+  const chNum = SOURCE_CHANNEL_MAP[source];
+  if (!chNum) return;
+  // Close breaking news popup
+  document.getElementById('breaking-container').innerHTML = '';
+  // Switch to Live TV tab
+  const liveTab = document.querySelector('button[data-tab="livetv"], button[data-tab="live"]');
+  if (liveTab) liveTab.click();
+  // Scroll to and highlight the channel in EPG
+  setTimeout(() => {
+    const rows = document.querySelectorAll('.epg-row');
+    for (const row of rows) {
+      const numEl = row.querySelector('.epg-ch .num');
+      if (numEl && numEl.textContent.trim() == chNum) {
+        row.scrollIntoView({behavior: 'smooth', block: 'center'});
+        row.style.background = '#1d9bf022';
+        row.style.border = '2px solid #1d9bf0';
+        row.style.borderRadius = '8px';
+        setTimeout(() => { row.style.background = ''; row.style.border = ''; }, 5000);
+        break;
+      }
+    }
+  }, 500);
 }
 
 function showBreakingFromQueue() {
@@ -702,6 +737,7 @@ function showBreakingFromQueue() {
             ${logo ? `<img class="bp-logo" src="${logo}" alt="${escHtml(item.source)}">` : ''}
             <span class="bp-channel-name">${escHtml(item.source)}${item.handle ? ' ' + escHtml(item.handle) : ''}</span>
           </div>
+          ${SOURCE_CHANNEL_MAP[item.source] ? `<button onclick="event.stopPropagation();watchBreakingChannel('${item.source}');" style="width:100%;margin-top:10px;background:#f4212e;border:none;color:#fff;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-size:14px;">▶ Watch Live on ${escHtml(item.source)}</button>` : ''}
         </div>
       </div>`;
     d.onclick = () => {
