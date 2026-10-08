@@ -40,7 +40,7 @@
   .epg-wrap { padding: 20px 24px; }
   .epg-controls { display: flex; gap: 12px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
   .epg-controls select { background: #141b26; color: #e8ecf1; border: 1px solid #2a3542; border-radius: 8px; padding: 6px 10px; font-size: 13px; }
-  .epg-scroll { overflow: auto; border: 1px solid #1c2530; border-radius: 10px; max-height: 65vh; }
+  .epg-scroll { overflow: auto; border: 1px solid #1c2530; border-radius: 10px; max-height: none; }
   .epg-timeline { min-width: 1100px; }
   .epg-time-header { display: flex; position: sticky; top: 0; z-index: 3; background: #0f151e; }
   .epg-time-header .corner { width: 170px; min-width: 170px; position: sticky; left: 0; z-index: 4; background: #0f151e; }
@@ -810,8 +810,32 @@ function renderMLBHub(el, data) {
     <div class="fh-section">
       <h2>MLB Breaking News</h2>
       <div id="mlb-news"></div>
-    </div>`;
+    </div>
+    <div id="mlb-collections"></div>`;
   loadMLBNews();
+  loadMLBCollections();
+}
+
+async function loadMLBCollections() {
+  try {
+    const r = await fetch('data/franchises.json');
+    const d = await r.json();
+    const el = document.getElementById('mlb-collections');
+    if (!el || !d.mlb?.collections) return;
+    el.innerHTML = Object.keys(d.mlb.collections).map(colName => `
+    <div class="fh-section">
+      <h2>${escHtml(colName)}</h2>
+      <div class="collection-grid">
+        ${d.mlb.collections[colName].map(c => `
+          <div class="collection-card">
+            ${c.img ? `<img src="${c.img}" alt="" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:10px;" onerror="this.style.display='none'">` : ''}
+            <div class="cc-title">${escHtml(c.title)}</div>
+            <div class="cc-meta">${escHtml(c.type)} · ${c.year}</div>
+            <div class="cc-desc">${escHtml(c.desc)}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+  } catch(e) { console.error('Collections error:', e); }
 }
 
 async function loadMLBNews() {
