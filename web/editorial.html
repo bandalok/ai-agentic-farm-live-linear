@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editorial Desk — Breaking News Control</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0e14; color: #e1e8ed; }
+  header { background: #11161d; border-bottom: 1px solid #1e2836; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+  header h1 { font-size: 20px; font-weight: 700; }
+  header h1 span { color: #ff4444; }
+  .stats { display: flex; gap: 24px; }
+  .stat { text-align: center; }
+  .stat .num { font-size: 24px; font-weight: 800; }
+  .stat .label { font-size: 11px; color: #8b98a8; text-transform: uppercase; letter-spacing: 1px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+  .panel { background: #11161d; border: 1px solid #1e2836; border-radius: 12px; padding: 20px; }
+  .panel h2 { font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .queue-item { background: #1a2230; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #5c6b7d; }
+  .queue-item.breaking { border-left-color: #ff4444; }
+  .queue-item .meta { font-size: 11px; color: #8b98a8; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .queue-item .title { font-weight: 600; font-size: 15px; margin-bottom: 4px; line-height: 1.4; }
+  .queue-item .urgency { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 12px; margin-bottom: 8px; }
+  .urgency.high { background: #ff444422; color: #ff6666; }
+  .urgency.medium { background: #ffaa0022; color: #ffaa00; }
+  .urgency.low { background: #5c6b7d22; color: #8b98a8; }
+  .actions { display: flex; gap: 8px; margin-top: 10px; }
+  .btn { border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .btn-approve { background: #34a853; color: #fff; }
+  .btn-reject { background: #3a4556; color: #fff; }
+  .btn-edit { background: #1a73e8; color: #fff; }
+  .btn-push { background: #ff4444; color: #fff; width: 100%; padding: 12px; font-size: 15px; margin-top: 12px; }
+  .approved-item { background: #1a2230; border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 4px solid #34a853; }
+  .approved-item .title { font-size: 14px; font-weight: 600; }
+  .approved-item .meta { font-size: 11px; color: #8b98a8; }
+  .live-preview { background: #000; border: 2px solid #ff4444; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .live-preview .breaking-label { background: #ff4444; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 4px; display: inline-block; margin-bottom: 8px; letter-spacing: 1px; }
+  .toolbar { display: flex; gap: 12px; margin-bottom: 20px; }
+  .toolbar .btn { padding: 10px 20px; }
+  #edit-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; }
+  #edit-modal .modal-box { max-width: 600px; margin: 100px auto; background: #11161d; border-radius: 12px; padding: 24px; border: 1px solid #2a3f5f; }
+  #edit-modal textarea { width: 100%; background: #1a2230; border: 1px solid #2a3f5f; color: #fff; border-radius: 6px; padding: 12px; font-size: 14px; min-height: 80px; margin: 12px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>●</span> Editorial Desk</h1>
+  <div class="stats">
+    <div class="stat"><div class="num" id="stat-pending">0</div><div class="label">Pending</div></div>
+    <div class="stat"><div class="num" id="stat-approved">0</div><div class="label">Approved</div></div>
+    <div class="stat"><div class="num" id="stat-live">0</div><div class="label">Live</div></div>
+  </div>
+</header>
+<main>
+  <div>
+    <div class="toolbar">
+      <button class="btn btn-edit" onclick="scanFeeds()">↻ Scan Feeds</button>
+      <span style="color:#8b98a8;font-size:13px;align-self:center;" id="last-scan"></span>
+    </div>
+    <div class="panel">
+      <h2>📥 Incoming Wire</h2>
+      <div id="queue"></div>
+    </div>
+  </div>
+  <div>
+    <div class="panel" style="margin-bottom:24px;">
+      <h2>📺 Live Preview</h2>
+      <div id="live-preview"><p style="color:#8b98a8;">Nothing live. Approve stories to push.</p></div>
+      <button class="btn btn-push" onclick="pushLive()">PUSH TO ALL VIEWERS</button>
+    </div>
+    <div class="panel">
+      <h2>✅ Approved Queue</h2>
+      <div id="approved"></div>
+    </div>
+    <div class="panel" style="margin-top:24px;">
+      <h2>📋 Push History</h2>
+      <div id="history"></div>
+    </div>
+  </div>
+</main>
+<div id="edit-modal">
+  <div class="modal-box">
+    <h3>Edit Headline</h3>
+    <textarea id="edit-text"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-reject" onclick="closeEdit()">Cancel</button>
+      <button class="btn btn-approve" onclick="saveEdit()">Save & Approve</button>
+    </div>
+  </div>
+</div>
+<script>
+let queue = [];
+let approved = [];
+let history = [];
+let editingId = null;
+
+// Load from localStorage or seed data
+function load() {
+  queue = JSON.parse(localStorage.getItem('ed_queue') || '[]');
+  approved = JSON.parse(localStorage.getItem('ed_approved') || '[]');
+  history = JSON.parse(localStorage.getItem('ed_history') || '[]');
+  if (!queue.length) seedData();
+  render();
+}
+
+function save() {
+  localStorage.setItem('ed_queue', JSON.stringify(queue));
+  localStorage.setItem('ed_approved', JSON.stringify(approved));
+  localStorage.setItem('ed_history', JSON.stringify(history));
+}
+
+function seedData() {
+  queue = [
+    {id:'1', source:'CNN', title:'BREAKING: Federal Reserve announces emergency rate cut amid market turmoil', urgency:'high', time:'2 min ago', is_breaking:true, status:'pending'},
+    {id:'2', source:'BBC', title:'Major earthquake strikes Pacific coast, tsunami warning issued', urgency:'high', time:'5 min ago', is_breaking:true, status:'pending'},
+    {id:'3', source:'CNN', title:'Tech CEO resigns effective immediately, board names interim replacement', urgency:'medium', time:'12 min ago', is_breaking:false, status:'pending'},
+    {id:'4', source:'BBC', title:'Parliament passes landmark climate bill in late-night vote', urgency:'medium', time:'18 min ago', is_breaking:false, status:'pending'},
+    {id:'5', source:'CNN', title:'New study reveals benefits of Mediterranean diet for heart health', urgency:'low', time:'25 min ago', is_breaking:false, status:'pending'},
+    {id:'6', source:'BBC', title:'Championship final set after dramatic semifinal penalty shootout', urgency:'low', time:'32 min ago', is_breaking:false, status:'pending'},
+  ];
+}
+
+function scanFeeds() {
+  document.getElementById('last-scan').textContent = 'Scanning...';
+  // In production, this would call the Python agent
+  setTimeout(() => {
+    document.getElementById('last-scan').textContent = 'Last scan: ' + new Date().toLocaleTimeString();
+    render();
+  }, 1000);
+}
+
+function approve(id) {
+  const item = queue.find(q => q.id === id);
+  if (item) {
+    item.status = 'approved';
+    item.approvedBy = 'Editor';
+    item.approvedAt = new Date().toISOString();
+    approved.push(item);
+    queue = queue.filter(q => q.id !== id);
+    save(); render();
+  }
+}
+
+function reject(id) {
+  queue = queue.filter(q => q.id !== id);
+  save(); render();
+}
+
+function editItem(id) {
+  const item = queue.find(q => q.id === id);
+  if (item) {
+    editingId = id;
+    document.getElementById('edit-text').value = item.title;
+    document.getElementById('edit-modal').style.display = 'block';
+  }
+}
+
+function closeEdit() {
+  document.getElementById('edit-modal').style.display = 'none';
+  editingId = null;
+}
+
+function saveEdit() {
+  const item = queue.find(q => q.id === editingId);
+  if (item) {
+    item.title = document.getElementById('edit-text').value;
+    item.edited = true;
+    closeEdit();
+    approve(editingId);
+  }
+}
+
+function pushLive() {
+  if (!approved.length) { alert('No approved stories to push.'); return; }
+  const pushed = [...approved];
+  history.unshift({
+    time: new Date().toISOString(),
+    count: pushed.length,
+    items: pushed.map(p => p.title),
+    by: 'Editor'
+  });
+  // Write to breaking_news.json format for EPG Farm
+  const bnData = { updated: new Date().toISOString(), items: pushed };
+  localStorage.setItem('epg_breaking_news', JSON.stringify(bnData));
+  approved = [];
+  save(); render();
+  alert(`Pushed ${pushed.length} stories live to all viewers.`);
+}
+
+function render() {
+  document.getElementById('stat-pending').textContent = queue.length;
+  document.getElementById('stat-approved').textContent = approved.length;
+  document.getElementById('stat-live').textContent = history.reduce((n,h) => n + h.count, 0);
+
+  document.getElementById('queue').innerHTML = queue.map(i => `
+    <div class="queue-item ${i.is_breaking ? 'breaking' : ''}">
+      <div class="meta"><span>${i.source}</span><span>${i.time}</span></div>
+      <span class="urgency ${i.urgency}">${i.urgency.toUpperCase()}</span>
+      <div class="title">${i.title}</div>
+      <div class="actions">
+        <button class="btn btn-approve" onclick="approve('${i.id}')">Approve</button>
+        <button class="btn btn-edit" onclick="editItem('${i.id}')">Edit</button>
+        <button class="btn btn-reject" onclick="reject('${i.id}')">Reject</button>
+      </div>
+    </div>`).join('') || '<p style="color:#8b98a8;">Queue empty. Click Scan Feeds.</p>';
+
+  document.getElementById('approved').innerHTML = approved.map(i => `
+    <div class="approved-item">
+      <div class="meta">${i.source} · approved by ${i.approvedBy}</div>
+      <div class="title">${i.title}</div>
+    </div>`).join('') || '<p style="color:#8b98a8;">No approved stories yet.</p>';
+
+  document.getElementById('live-preview').innerHTML = approved.length ? approved.map(i => `
+    <div class="live-preview">
+      <span class="breaking-label">BREAKING NEWS</span>
+      <div style="font-weight:700;font-size:16px;">${i.title}</div>
+      <div style="font-size:12px;color:#8b98a8;margin-top:4px;">${i.source}</div>
+    </div>`).join('') : '<p style="color:#8b98a8;">Nothing live. Approve stories to push.</p>';
+
+  document.getElementById('history').innerHTML = history.slice(0, 10).map(h => `
+    <div style="padding:10px 0;border-bottom:1px solid #1e2836;">
+      <div style="font-size:12px;color:#8b98a8;">${new Date(h.time).toLocaleString()} · ${h.by} · ${h.count} stories</div>
+      <div style="font-size:13px;margin-top:4px;">${h.items[0]}${h.count > 1 ? ` <span style="color:#8b98a8;">+${h.count - 1} more</span>` : ''}</div>
+    </div>`).join('') || '<p style="color:#8b98a8;">No pushes yet.</p>';
+}
+
+load();
+</script>
+</body>
+</html>
