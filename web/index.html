@@ -1117,13 +1117,19 @@ async function loadMLBNews() {
     const r = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news?limit=5');
     const d = await r.json();
     if (d.articles && d.articles.length) {
-      el.innerHTML = d.articles.map(a => `
-        <div class="news-card" style="display:flex;gap:14px;align-items:flex-start;cursor:pointer;" onclick="window.open('${a.links.web.href}','_blank')">
-          ${a.images?.[0]?.url ? `<img src="${a.images[0].url}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
-          <div><div class="nc-headline">${escHtml(a.headline)}</div>
-          <div class="nc-detail">${escHtml(a.description || '')}</div>
-          <div class="nc-time">${escHtml(a.published || '')} · ESPN</div></div>
-        </div>`).join('');
+      window._mlbNews = d.articles.map(a => ({
+        headline: a.headline, desc: a.description || '',
+        time: a.published || '', source: 'ESPN',
+        img: a.images?.[0]?.url || '', link: a.links.web.href
+      }));
+      el.innerHTML = `<div class="tiles" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">` +
+        window._mlbNews.map((n, i) => `
+        <div class="tile" onclick="openMlbNews(${i})">
+          ${n.img ? `<div class="art" style="background-image:url('${escHtml(n.img)}')"><div class="art-grad"></div></div>` : ''}
+          <h3>${escHtml(n.headline)}</h3>
+          <p>${escHtml(n.desc.slice(0, 100))}${n.desc.length > 100 ? '...' : ''}</p>
+          <div class="meta">${escHtml(n.time)} · ESPN</div>
+        </div>`).join('') + `</div>`;
       return;
     }
     throw new Error('ESPN empty');
@@ -1143,24 +1149,41 @@ async function loadMLBNews() {
     if (!xml) throw new Error('RSS proxies failed');
     const doc = new DOMParser().parseFromString(xml, 'text/xml');
     const items = [...doc.querySelectorAll('item')].slice(0, 5);
-    el.innerHTML = items.map(it => {
-      const title = it.querySelector('title')?.textContent || '';
-      const link = it.querySelector('link')?.textContent || '#';
-      const desc = it.querySelector('description')?.textContent?.replace(/<[^>]*>/g, '').slice(0, 120) || '';
-      const pub = it.querySelector('pubDate')?.textContent?.slice(0, 16) || '';
-      const img = it.querySelector('enclosure[type^="image"]')?.getAttribute('url') || '';
-      return `
-        <div class="news-card" style="display:flex;gap:14px;align-items:flex-start;cursor:pointer;" onclick="window.open('${escHtml(link)}','_blank')">
-          ${img ? `<img src="${escHtml(img)}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
-          <div><div class="nc-headline">${escHtml(title)}</div>
-          <div class="nc-detail">${escHtml(desc)}</div>
-          <div class="nc-time">${escHtml(pub)} · MLB.com</div></div>
-        </div>`;
-    }).join('') || '<p style="color:#5c6b7d">No news available.</p>';
+    window._mlbNews = items.map(it => ({
+      headline: it.querySelector('title')?.textContent || '',
+      link: it.querySelector('link')?.textContent || '#',
+      desc: it.querySelector('description')?.textContent?.replace(/<[^>]*>/g, '') || '',
+      time: it.querySelector('pubDate')?.textContent?.slice(0, 16) || '',
+      source: 'MLB.com',
+      img: it.querySelector('enclosure[type^="image"]')?.getAttribute('url') || ''
+    }));
+    el.innerHTML = window._mlbNews.length ?
+      `<div class="tiles" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">` +
+      window._mlbNews.map((n, i) => `
+        <div class="tile" onclick="openMlbNews(${i})">
+          ${n.img ? `<div class="art" style="background-image:url('${escHtml(n.img)}')"><div class="art-grad"></div></div>` : ''}
+          <h3>${escHtml(n.headline)}</h3>
+          <p>${escHtml(n.desc.slice(0, 100))}${n.desc.length > 100 ? '...' : ''}</p>
+          <div class="meta">${escHtml(n.time)} · MLB.com</div>
+        </div>`).join('') + `</div>`
+      : '<p style="color:#5c6b7d">No news available.</p>';
   } catch(e2) {
     console.error('MLB news error:', e2);
     el.innerHTML = '<p style="color:#5c6b7d">News temporarily unavailable.</p>';
   }
+}
+function openMlbNews(i) {
+  const n = window._mlbNews?.[i];
+  if (!n) return;
+  document.getElementById('m-title').textContent = n.headline;
+  document.getElementById('m-desc').textContent = n.desc;
+  document.getElementById('m-meta').textContent = `${n.time} · ${n.source}`;
+  // Add read full story link
+  const meta = document.getElementById('m-meta');
+  if (n.link && n.link !== '#') {
+    meta.innerHTML += ` · <a href="${escHtml(n.link)}" target="_blank" style="color:#4da3ff;">Read full story →</a>`;
+  }
+  document.getElementById('modal').classList.add('open');
 }
 function renderAdmin() {
   const el = document.getElementById('provider-lineups');
