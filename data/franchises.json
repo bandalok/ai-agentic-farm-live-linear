@@ -201,19 +201,19 @@
     "headline": "Yankees Clinch Playoff Berth with Walk-Off Win",
     "detail": "Aaron Judge hit a walk-off home run in the 9th to seal the Yankees' postseason spot.",
     "time": "2h ago",
-    "img": "img/baseball1.jpg"
+    "img": "img/baseball3.jpg"
    },
    {
     "headline": "Dodgers' Ace Throws No-Hitter Against Giants",
     "detail": "Historic performance at Dodger Stadium as the ace Ks 14 in a complete game no-hitter.",
     "time": "5h ago",
-    "img": "img/baseball2.jpg"
+    "img": "img/baseball4.jpg"
    },
    {
     "headline": "Trade Deadline: Astros Acquire All-Star Closer",
     "detail": "Houston bolsters bullpen with blockbuster deal, giving up two top prospects.",
     "time": "1d ago",
-    "img": "img/baseball3.jpg"
+    "img": "img/baseball5.jpg"
    }
   ],
   "collection": [
@@ -351,42 +351,42 @@
      "year": 1993,
      "type": "Movie",
      "desc": "Summer, baseball, and Benny the Jet.",
-     "img": "img/baseball1.jpg"
+     "img": "img/baseball7.jpg"
     },
     {
      "title": "Major League",
      "year": 1989,
      "type": "Movie",
      "desc": "Cleveland's lovable losers.",
-     "img": "img/baseball2.jpg"
+     "img": "img/baseball8.jpg"
     },
     {
      "title": "Eight Men Out",
      "year": 1988,
      "type": "Movie",
      "desc": "The 1919 Black Sox scandal.",
-     "img": "img/baseball3.jpg"
+     "img": "img/baseball9.jpg"
     },
     {
      "title": "The Rookie",
      "year": 2002,
      "type": "Movie",
      "desc": "Jim Morris's improbable MLB debut at 35.",
-     "img": "img/baseball4.jpg"
+     "img": "img/baseball10.jpg"
     },
     {
      "title": "61*",
      "year": 2001,
      "type": "Movie",
      "desc": "Maris vs Mantle home run chase.",
-     "img": "img/baseball5.jpg"
+     "img": "img/baseball11.jpg"
     },
     {
      "title": "Sugar",
      "year": 2008,
      "type": "Movie",
      "desc": "Dominican prospect's journey.",
-     "img": "img/baseball6.jpg"
+     "img": "img/baseball12.jpg"
     }
    ],
    "Baseball Documentaries": [
@@ -395,28 +395,28 @@
      "year": 1994,
      "type": "Docuseries",
      "desc": "The definitive 9-part history of America's pastime.",
-     "img": "img/baseball2.jpg"
+     "img": "img/baseball13.jpg"
     },
     {
      "title": "The Last Dance of Baseball",
      "year": 2020,
      "type": "Documentary",
      "desc": "Inside the 2020 season.",
-     "img": "img/baseball3.jpg"
+     "img": "img/baseball14.jpg"
     },
     {
      "title": "Fastball",
      "year": 2016,
      "type": "Documentary",
      "desc": "The science and art of the fastball.",
-     "img": "img/baseball4.jpg"
+     "img": "img/baseball15.jpg"
     },
     {
      "title": "No No: A Dockumentary",
      "year": 2014,
      "type": "Documentary",
      "desc": "Dock Ellis's LSD no-hitter.",
-     "img": "img/baseball5.jpg"
+     "img": "img/baseball16.jpg"
     }
    ],
    "Baseball Shows": [
@@ -425,28 +425,28 @@
      "year": 2022,
      "type": "Series",
      "desc": "Lakers dynasty (crossover sports drama).",
-     "img": "img/baseball6.jpg"
+     "img": "img/baseball17.jpg"
     },
     {
      "title": "Eastbound & Down",
      "year": 2009,
      "type": "Series",
      "desc": "Kenny Powers, washed-up reliever.",
-     "img": "img/baseball1.jpg"
+     "img": "img/baseball18.jpg"
     },
     {
      "title": "Pitch",
      "year": 2016,
      "type": "Series",
      "desc": "First woman in MLB.",
-     "img": "img/baseball2.jpg"
+     "img": "img/baseball1.jpg"
     },
     {
      "title": "The Bronx Is Burning",
      "year": 2007,
      "type": "Miniseries",
      "desc": "1977 Yankees season.",
-     "img": "img/baseball3.jpg"
+     "img": "img/baseball2.jpg"
     }
    ]
   },
