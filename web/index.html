@@ -742,6 +742,17 @@ const NEWS_LOGOS = {
 };
 // Breaking news thumbnails (varied news images)
 const BREAKING_THUMBS = ['img/news.jpg','img/news2.jpg','img/news3.jpg','img/news4.jpg','img/news5.jpg'];
+const CATEGORY_THUMBS = {
+  'Politics': 'img/news_politics.jpg',
+  'Tech': 'img/news_tech.jpg',
+  'Business': 'img/news_business.jpg',
+  'World': 'img/news_world.jpg',
+  'Sports': 'img/football.jpg',
+  'Entertainment': 'img/entertainment.jpg',
+};
+function getBreakingThumb(category) {
+  return CATEGORY_THUMBS[category] || BREAKING_THUMBS[Math.floor(Math.random() * BREAKING_THUMBS.length)];
+}
 
 let breakingQueue = [];
 let breakingIndex = 0;
@@ -811,7 +822,7 @@ function showBreakingFromQueue() {
   wrapper.style.cssText = 'display:flex;gap:12px;justify-content:flex-end;';
   cards.forEach((item, idx) => {
     const logo = NEWS_LOGOS[item.source];
-    const thumb = BREAKING_THUMBS[Math.floor(Math.random() * BREAKING_THUMBS.length)];
+    const thumb = item.image || null;
     const d = document.createElement('div');
     d.className = 'breaking-popup';
     d.style.cssText = 'position:static;width:320px;flex-shrink:0;';
@@ -819,7 +830,7 @@ function showBreakingFromQueue() {
     d.innerHTML = `
       <div class="bp-header"><span>BREAKING NEWS</span></div>
       <div class="bp-body">
-        <img class="bp-thumb" src="${thumb}" alt="" style="height:100px;">
+        ${thumb ? `<img class="bp-thumb" src="${thumb}" alt="" style="height:100px;" onerror="this.style.display='none'">` : ''}
         <div class="bp-content">
           ${item.category ? `<span style="display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px;background:${catColor}22;color:${catColor};">${escHtml(item.category).toUpperCase()}</span>` : ''}
           <div class="bp-headline" style="font-size:14px;">${escHtml(item.title.replace('BREAKING: ', '').substring(0, 100))}${item.title.length > 100 ? '...' : ''}</div>
@@ -847,7 +858,7 @@ function showBreakingPopup() {
   container.innerHTML = '';
   const b = activeBreaking;
   const logo = NEWS_LOGOS[b.channel];
-  const thumb = BREAKING_THUMBS[Math.floor(Math.random() * BREAKING_THUMBS.length)];
+  const thumb = getBreakingThumb(item.category);
   const d = document.createElement('div');
   d.className = 'breaking-popup';
   d.innerHTML = `
